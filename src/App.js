@@ -12,31 +12,50 @@ import MyAccount from './pages/MyAccount';
 import Header from './components/shared/Header';
 import BottomNav from './components/shared/BottomNav';
 import theme from './context/theme';
+import Footer from './components/shared/Footer';
+import BottomNavCompansator from './components/shared/BottomNavCompansator';
+import PostDetails from './pages/PostDetails';
+
+import store from './store';
+import { Provider } from 'react-redux';
+import EditPost from './pages/EditPost';
+import AllPostByUser from './pages/AllPostByUser';
+import Notification from './pages/Notification';
+import ExploreShops from './pages/ExploreShops';
 
 const App = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Container component="main" maxWidth={false} disableGutters>
-        <Box sx={{ maxWidth: '1024px', mx: 'auto', px: 2, mt: 2 }}>
-          <BrowserRouter>
-            <Header />
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/findPost" element={<FindPost />} />
-              <Route path="/createPost" element={<CreatePost />} />
-              <Route path="/myAccount" element={<MyAccount />} />
+    <Provider store={store}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Container component="main" maxWidth={false} disableGutters>
+          <Box sx={{ maxWidth: '1024px', mx: 'auto', my: 2 }}>
+            <BrowserRouter>
+              <Header />
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/post/:id" element={<PostDetails />} />
+                <Route path="/allPost/user/:id" element={<AllPostByUser />} />
+                <Route path="/findPost" element={<FindPost />} />
+                <Route path="/createPost" element={<CreatePost />} />
+                <Route path="/editPost/:id" element={<EditPost />} />
+                <Route path="/myAccount" element={<MyAccount />} />
+                <Route path="/notification" element={<Notification />} />
+                <Route path="/exploreShops" element={<ExploreShops />} />
 
-              <Route path="/signin" element={<SignIn />} />
-              <Route path="/signup" element={<SignUp />} />
+                <Route path="/signin" element={<SignIn />} />
+                <Route path="/signup" element={<SignUp />} />
 
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-            <BottomNav />
-          </BrowserRouter>
-        </Box>
-      </Container>
-    </ThemeProvider>
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+              <BottomNav />
+            </BrowserRouter>
+          </Box>
+          <Footer />
+          <BottomNavCompansator />
+        </Container>
+      </ThemeProvider>
+    </Provider>
   );
 };
 

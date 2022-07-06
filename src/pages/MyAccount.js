@@ -10,6 +10,7 @@ import ManageAccount from '../components/myAccount/ManageAccount';
 import MyPosts from '../components/myAccount/MyPosts';
 import SavedItems from '../components/myAccount/SavedItems';
 import History from '../components/myAccount/History';
+import { Paper } from '@mui/material';
 
 const tabItems = [
   {
@@ -41,11 +42,7 @@ const TabPanel = (props) => {
       aria-labelledby={`simple-tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
+      {value === index && <Box sx={{ py: 2 }}>{children}</Box>}
     </Box>
   );
 };
@@ -65,7 +62,7 @@ const MyAccount = () => {
   }, [location]);
 
   return (
-    <Box sx={{ width: '100%' }}>
+    <Paper sx={{ width: '100%' }}>
       <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Tabs
           variant="scrollable"
@@ -84,7 +81,7 @@ const MyAccount = () => {
           {item.component}
         </TabPanel>
       ))}
-    </Box>
+    </Paper>
   );
 };
 

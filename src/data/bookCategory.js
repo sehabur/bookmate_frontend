@@ -1,0 +1,18 @@
+export const categories = [
+  'Text books',
+  'Guide books',
+  'Test papers',
+  'Literature',
+  'Mathematics',
+  'Science & Technology',
+  'Computer & Internet',
+  'Business & Entrepreneurship',
+  'Self development',
+  'Engineering',
+  'Medical',
+  'University',
+  'Literature',
+  'Comics',
+  'Religious books',
+  'Others',
+];

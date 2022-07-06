@@ -12,44 +12,62 @@ import {
 
 import { teal } from '@mui/material/colors';
 
-import beat from '../../assets/beat.jpg';
+import ReactTimeAgo from 'react-time-ago';
 
-const MainCard = () => {
+import noImage from '../../assets/no_image_placeholder.jpg';
+
+import SellIcon from '@mui/icons-material/Sell';
+import SwapCallsIcon from '@mui/icons-material/SwapCalls';
+import { useNavigate } from 'react-router-dom';
+
+import { bdtSign } from '../../data/constants';
+
+const MainCard = ({ data }) => {
+  const navigate = useNavigate();
+
+  const handleCardClick = (postId) => {
+    navigate(`/post/${postId}`);
+  };
+
   return (
     <Card
       sx={{
-        width: { sm: '48%' },
         '& .MuiCardContent-root': {
           paddingBottom: 1,
         },
-        mb: 2,
-        borderRadius: { xs: 0, sm: 'inherit' },
-        mx: { xs: 0, sm: 2 },
       }}
     >
       <CardActionArea
+        onClick={() => handleCardClick(data._id)}
         sx={{
           display: 'flex',
+          justifyContent: 'flex-start',
         }}
       >
         <CardMedia
           component="img"
           sx={{
-            width: { xs: 110, sm: 160 },
+            width: { xs: 90, sm: 130 },
             height: { xs: 120, sm: 160 },
             my: { sm: 1.5 },
             ml: 1.5,
           }}
-          image={beat}
-          alt="Live from space album cover"
+          image={`${process.env.REACT_APP_BACKEND_URL}/images/${data.image1}`}
+          onError={(e) => {
+            e.target.onerror = null;
+            e.target.src = noImage; // fallback image //
+          }}
+          alt="No image available"
         />
-        <Chip
+
+        {/* GPS work. will do later */}
+        {/* <Chip
           label="12 kM"
           color="warning"
           // icon={<LocationOnIcon sx={{ fontSize: '.9rem' }} />}
           size="small"
-          sx={{ fontSize: '.7rem', position: 'absolute', left: 8, top: 10 }}
-        />
+          sx={{ fontSize: '.7rem', position: 'absolute', left: 8, top: 8 }}
+        /> */}
         <Box>
           <CardContent
             sx={{
@@ -60,38 +78,74 @@ const MainCard = () => {
             }}
           >
             <Typography
-              variant="body2"
-              sx={{ mb: 0.8, color: 'info.dark', fontWeight: 'bold' }}
+              sx={{
+                color: 'info.dark',
+                fontWeight: 'bold',
+                fontSize: '1rem',
+              }}
             >
-              Putul Nacher Itikotha by Manik Bondhopadhay
+              {data.title}
             </Typography>
-            <Typography
-              color="text.secondary"
-              sx={{ mb: 0.5, fontSize: '.8rem' }}
-            >
-              Pabna, Uponnyash
+            <Typography sx={{ mb: 0.8, fontSize: '.85rem' }}>
+              By {data.writer}
             </Typography>
+
             <Stack direction="row" alignItems="center" sx={{ mb: 1 }}>
               <Typography
-                variant="subtitle1"
-                sx={{
-                  fontSize: '1.1rem',
-                  mr: 1.5,
-                  fontWeight: 'bold',
-                  color: teal[600],
-                }}
+                color="text.secondary"
+                sx={{ fontSize: '.8rem', mr: 1.3 }}
               >
-                ৳135
+                {data.area}, {data.district}
               </Typography>
-              <Chip
-                label="Exchange Offer"
-                color="info"
-                size="small"
-                sx={{ fontSize: '.75rem' }}
-              />
+              <Chip label={data.category} size="small" variant="outlined" />
             </Stack>
+
+            <Stack direction="row" alignItems="center" sx={{ mb: 1 }}>
+              {data.enableSellOffer && (
+                <Chip
+                  label="Sell Offer"
+                  color="success"
+                  size="small"
+                  icon={<SellIcon fontSize="small" />}
+                  sx={{
+                    fontSize: '.8rem',
+                    borderRadius: 1.2,
+                    mr: 1,
+                  }}
+                />
+              )}
+
+              {data.enableExchangeOffer && (
+                <Chip
+                  label="Exchange Offer"
+                  color="info"
+                  size="small"
+                  icon={<SwapCallsIcon fontSize="small" />}
+                  sx={{
+                    fontSize: '.8rem',
+                    borderRadius: 1.2,
+                    mr: 1,
+                  }}
+                />
+              )}
+            </Stack>
+
+            {data.enableSellOffer && (
+              <Typography
+                variant="body2"
+                sx={{ color: 'success.dark', fontSize: '1rem' }}
+              >
+                Price: {bdtSign} {data.price}
+              </Typography>
+            )}
+
             <Typography textAlign="right" sx={{ fontSize: '.75rem' }}>
-              posted 15 minutes ago
+              posted{' '}
+              <ReactTimeAgo
+                date={data.createdAt}
+                locale="en-US"
+                timeStyle="round-minute"
+              />
             </Typography>
           </CardContent>
         </Box>
