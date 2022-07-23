@@ -34,7 +34,7 @@ import { categories } from '../data/bookCategory';
 import SearchBar from 'material-ui-search-bar';
 import SearchIcon from '@mui/icons-material/Search';
 import { blue } from '@mui/material/colors';
-// import Mui5search from 'mui5-search';
+import CloseIcon from '@mui/icons-material/Close';
 
 const sortByOptions = [
   'Date: Newest on top',
@@ -432,9 +432,26 @@ const FindPost = () => {
         open={openDrawer}
         onClose={() => handleToggleDrawer(false)}
       >
-        <Typography variant="h6" textAlign="center" sx={{ mt: 1 }}>
-          Sort and filtering options
-        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-around',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="h6" textAlign="center" sx={{ mt: 1 }}>
+            Sort and filtering options
+          </Typography>
+          <Button
+            variant="text"
+            color="warning"
+            startIcon={<CloseIcon fontSize="small" />}
+            onClick={() => handleToggleDrawer(false)}
+          >
+            Cancel
+          </Button>
+        </Box>
+
         {filterMobileMenu}
       </Drawer>
 

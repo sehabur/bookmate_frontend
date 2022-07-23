@@ -103,7 +103,7 @@ const RequestCard = ({ data }) => {
               my: 1.5,
               ml: 1.5,
             }}
-            image={`${process.env.REACT_APP_BACKEND_URL}/images/${data.orderItem.image1}`}
+            image={`${process.env.REACT_APP_CLOUD_IMAGE_URL}/${data.orderItem.image1}`}
             onError={(e) => {
               e.target.onerror = null;
               e.target.src = noImage; // fallback image //

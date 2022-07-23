@@ -10,8 +10,6 @@ import {
   Typography,
 } from '@mui/material';
 
-import { teal } from '@mui/material/colors';
-
 import ReactTimeAgo from 'react-time-ago';
 
 import noImage from '../../assets/no_image_placeholder.jpg';
@@ -52,7 +50,7 @@ const MainCard = ({ data }) => {
             my: { sm: 1.5 },
             ml: 1.5,
           }}
-          image={`${process.env.REACT_APP_BACKEND_URL}/images/${data.image1}`}
+          image={`${process.env.REACT_APP_CLOUD_IMAGE_URL}/${data.image1}`}
           onError={(e) => {
             e.target.onerror = null;
             e.target.src = noImage; // fallback image //

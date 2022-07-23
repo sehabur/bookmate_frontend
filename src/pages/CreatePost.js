@@ -67,9 +67,9 @@ const CreatePost = () => {
 
   useEffect(() => {
     if (!userLoggedIn) {
-      navigate('/signin');
+      navigate('/signin?redirect=createPost');
     }
-  }, [userLoggedIn, navigate]);
+  }, [navigate, userLoggedIn]);
 
   useEffect(() => {
     if (!(formInputs.image1 || formInputs.image2 || formInputs.image3)) {

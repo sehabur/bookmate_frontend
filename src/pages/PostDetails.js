@@ -16,7 +16,6 @@ import { useParams, Link as RouterLink } from 'react-router-dom';
 
 import { Carousel } from 'react-carousel-minimal';
 
-import ShareIcon from '@mui/icons-material/Share';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarkAddedIcon from '@mui/icons-material/BookmarkAdded';
 import SellIcon from '@mui/icons-material/Sell';
@@ -44,10 +43,6 @@ const PostDetails = () => {
   const [postDetails, setPostDetails] = useState(null);
 
   const [isSaved, setIsSaved] = useState(null);
-
-  const [errorMessage, setErrorMessage] = useState('');
-
-  const [successMessage, setSuccessMessage] = useState('');
 
   const auth = useSelector((state) => state.auth);
 
@@ -77,17 +72,17 @@ const PostDetails = () => {
   if (postDetails) {
     if (postDetails.image1) {
       images.push({
-        image: `${process.env.REACT_APP_BACKEND_URL}/images/${postDetails.image1}`,
+        image: `${process.env.REACT_APP_CLOUD_IMAGE_URL}/${postDetails.image1}`,
       });
     }
     if (postDetails.image2) {
       images.push({
-        image: `${process.env.REACT_APP_BACKEND_URL}/images/${postDetails.image2}`,
+        image: `${process.env.REACT_APP_CLOUD_IMAGE_URL}/${postDetails.image2}`,
       });
     }
     if (postDetails.image3) {
       images.push({
-        image: `${process.env.REACT_APP_BACKEND_URL}/images/${postDetails.image3}`,
+        image: `${process.env.REACT_APP_CLOUD_IMAGE_URL}/${postDetails.image3}`,
       });
     }
   }
@@ -137,16 +132,23 @@ const PostDetails = () => {
 
   const handleSaveItem = async () => {
     try {
-      setIsLoading(true);
-
-      const action = isSaved ? 'delete' : 'save';
-      await axios.patch(
-        `${process.env.REACT_APP_BACKEND_URL}/api/posts/savePost/${postId}?action=${action}`,
-        {},
-        config
-      );
-      setIsSaved(!isSaved);
-      setIsLoading(false);
+      if (auth) {
+        setIsLoading(true);
+        const action = isSaved ? 'delete' : 'save';
+        await axios.patch(
+          `${process.env.REACT_APP_BACKEND_URL}/api/posts/savePost/${postId}?action=${action}`,
+          {},
+          config
+        );
+        setIsSaved(!isSaved);
+        setIsLoading(false);
+      } else {
+        setToastOpen(true);
+        setToastMessage({
+          severity: 'error',
+          message: 'Please login to save a post for later.',
+        });
+      }
     } catch (error) {
       setIsLoading(false);
       console.log(error);
@@ -155,33 +157,40 @@ const PostDetails = () => {
 
   const handlePlaceOrder = async (e, offerType) => {
     try {
-      setIsLoading(true);
+      if (auth) {
+        setIsLoading(true);
+        const response = await axios.post(
+          `${process.env.REACT_APP_BACKEND_URL}/api/orders/request`,
+          {
+            requestedTo: postDetails.user._id,
+            orderItem: postId,
+            offerType,
+            price: postDetails.price,
+            bookTitle: postDetails.title,
+            requestTime: new Date(),
+          },
+          config
+        );
 
-      const response = await axios.post(
-        `${process.env.REACT_APP_BACKEND_URL}/api/orders/request`,
-        {
-          requestedTo: postDetails.user._id,
-          orderItem: postId,
-          offerType,
-          price: postDetails.price,
-          bookTitle: postDetails.title,
-          requestTime: new Date(),
-        },
-        config
-      );
-
-      if (response.status === 201) {
+        if (response.status === 201) {
+          setToastOpen(true);
+          setToastMessage({
+            severity: 'success',
+            message: `Your ${offerType} request placed successfully. Go to History to see all requests.`,
+          });
+          if (offerType === 'exchange') {
+            setIsExchangeReqPlaced(true);
+          } else if (offerType === 'buy') {
+            setIsBuyReqPlaced(true);
+          }
+          setIsLoading(false);
+        }
+      } else {
         setToastOpen(true);
         setToastMessage({
-          severity: 'success',
-          message: `Your ${offerType} request placed successfully. Go to History to see all requests.`,
+          severity: 'error',
+          message: 'Please login to send a request.',
         });
-        if (offerType === 'exchange') {
-          setIsExchangeReqPlaced(true);
-        } else if (offerType === 'buy') {
-          setIsBuyReqPlaced(true);
-        }
-        setIsLoading(false);
       }
     } catch (error) {
       setToastOpen(true);
@@ -227,9 +236,10 @@ const PostDetails = () => {
             <Box sx={{ flexGrow: 1 }} />
             <Grid item>
               <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <Button variant="text" startIcon={<ShareIcon />}>
+                {/* Share button -> Later work */}
+                {/* <Button variant="text" startIcon={<ShareIcon />}>
                   Share
-                </Button>
+                </Button> */}
                 {!isPostFromUser ? (
                   <>
                     {isSaved ? (
@@ -277,7 +287,7 @@ const PostDetails = () => {
                 radius="8px"
                 slideNumber={true}
                 dots={true}
-                slideBackgroundColor="#f5f5f5"
+                slideBackgroundColor="#555555"
                 slideImageFit="contain"
                 thumbnails={true}
                 thumbnailWidth="100px"
@@ -285,6 +295,7 @@ const PostDetails = () => {
                   textAlign: 'center',
                   margin: '20px auto',
                 }}
+                arrowStyle={{ color: 'red' }}
               />
               <Grid container alignItems="center" sx={{ mb: 2 }}>
                 <Grid item>
@@ -319,18 +330,20 @@ const PostDetails = () => {
               </Grid>
 
               {postDetails.enableSellOffer && (
-                <Typography
-                  sx={{ mb: 0.5, color: 'green', fontSize: '1.2rem' }}
-                >
+                <Typography sx={{ mb: 1, color: 'green', fontSize: '1.2rem' }}>
                   Price: {bdtSign} {postDetails.price}
                 </Typography>
               )}
 
               <Typography sx={{ mb: 0.5 }}>
-                Location: {postDetails.area}, {postDetails.district}
+                Location: {postDetails.area}, {postDetails.district},{' '}
+                {postDetails.division}
               </Typography>
               <Typography sx={{ mb: 0.5 }}>
                 Category: {postDetails.category}
+              </Typography>
+              <Typography sx={{ mb: 0.5 }}>
+                Writer: {postDetails.writer}
               </Typography>
 
               {!isPostFromUser ? (
@@ -338,32 +351,32 @@ const PostDetails = () => {
                   {isBuyReqPlaced ? (
                     <Stack direction="row" alignItems="center">
                       <CheckCircleOutlineIcon />
-                      <Typography sx={{ ml: 1 }}>Buy Request Placed</Typography>
+                      <Typography sx={{ ml: 0.5 }}>
+                        Buy Request Placed
+                      </Typography>
                     </Stack>
                   ) : (
                     <Button
                       variant="outlined"
-                      fullWidth={matchesSmDown}
                       onClick={(e) => handlePlaceOrder(e, 'buy')}
                     >
-                      Place buy request
+                      Send Buy request
                     </Button>
                   )}
                   {isExchangeReqPlaced ? (
                     <Stack direction="row" alignItems="center" sx={{ ml: 2 }}>
                       <CheckCircleOutlineIcon />
-                      <Typography sx={{ ml: 1 }}>
+                      <Typography sx={{ ml: 0.5 }}>
                         Exchange Request Placed
                       </Typography>
                     </Stack>
                   ) : (
                     <Button
                       variant="contained"
-                      fullWidth={matchesSmDown}
-                      sx={{ ml: { xs: 0, sm: 2 }, mt: { xs: 2, sm: 0 } }}
+                      sx={{ ml: { xs: 1, sm: 2 } }}
                       onClick={(e) => handlePlaceOrder(e, 'exchange')}
                     >
-                      Place exchange request
+                      Send Exchange request
                     </Button>
                   )}
                 </Box>
@@ -405,7 +418,7 @@ const PostDetails = () => {
                   <Grid container spacing={2} sx={{ mb: 2 }}>
                     <Grid item>
                       <Avatar
-                        src={`${process.env.REACT_APP_BACKEND_URL}/images/${postDetails.user.image}`}
+                        src={`${process.env.REACT_APP_CLOUD_IMAGE_URL}/${postDetails.user.image}`}
                         sx={{
                           width: 50,
                           height: 50,

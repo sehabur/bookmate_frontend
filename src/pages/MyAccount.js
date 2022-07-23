@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
@@ -11,6 +11,7 @@ import MyPosts from '../components/myAccount/MyPosts';
 import SavedItems from '../components/myAccount/SavedItems';
 import History from '../components/myAccount/History';
 import { Paper } from '@mui/material';
+import { useSelector } from 'react-redux';
 
 const tabItems = [
   {
@@ -52,9 +53,21 @@ const MyAccount = () => {
 
   const [value, setValue] = useState(0);
 
+  const navigate = useNavigate();
+
+  const auth = useSelector((state) => state.auth);
+
+  const userLoggedIn = auth && auth.isLoggedIn;
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
+
+  useEffect(() => {
+    if (!userLoggedIn) {
+      navigate('/signin');
+    }
+  }, [navigate, userLoggedIn]);
 
   useEffect(() => {
     const tabIndex = location.hash ? Number(location.hash.replace('#', '')) : 0;

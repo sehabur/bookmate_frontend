@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Box,
   Button,
   Grid,
@@ -7,15 +6,15 @@ import {
   Typography,
   Alert,
   Divider,
+  MenuItem,
 } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 
-import noImage from '../../assets/no_image_placeholder.jpg';
-
-import CloseIcon from '@mui/icons-material/Close';
+import Spinner from '../shared/Spinner';
+import { districtMapping } from '../../data/districtMap';
 
 const formDefaultState = {
   shopName: '',
@@ -23,6 +22,9 @@ const formDefaultState = {
   firstName: '',
   lastName: '',
   image: null,
+  division: '',
+  district: '',
+  area: '',
 };
 
 const ManageAccount = () => {
@@ -59,6 +61,7 @@ const ManageAccount = () => {
 
   const getUserDetails = async () => {
     try {
+      console.log(process.env);
       setIsLoading(true);
       const userRespose = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}/api/users/profile/${
@@ -79,7 +82,7 @@ const ManageAccount = () => {
       });
       if (userRespose.data.user.image) {
         setImageUrl(
-          `${process.env.REACT_APP_BACKEND_URL}/images/${userRespose.data.user.image}`
+          `${process.env.REACT_APP_CLOUD_IMAGE_URL}/${userRespose.data.user.image}`
         );
       }
       setIsLoading(false);
@@ -176,6 +179,7 @@ const ManageAccount = () => {
         px: { xs: 4, sm: 15 },
       }}
     >
+      <Spinner open={isLoading} />
       <Typography sx={{ pb: 1, pt: 1, mb: 3, fontSize: '1.3rem' }}>
         Manage your account
       </Typography>
@@ -228,6 +232,62 @@ const ManageAccount = () => {
             value={formInputs.lastName}
             onChange={handleChange}
           ></TextField>
+        </Grid>
+
+        <Grid item xs={12} sm={4}>
+          <TextField
+            select
+            label="Division"
+            name="division"
+            fullWidth
+            value={formInputs.division}
+            onChange={handleChange}
+            sx={{ width: '100%' }}
+            size="small"
+            required
+          >
+            {districtMapping.map((option) => (
+              <MenuItem key={option.id} value={option.division}>
+                {option.division}
+              </MenuItem>
+            ))}
+          </TextField>
+        </Grid>
+
+        <Grid item xs={12} sm={4}>
+          <TextField
+            select
+            label="District"
+            name="district"
+            fullWidth
+            value={formInputs.district}
+            onChange={handleChange}
+            size="small"
+            required
+          >
+            {districtMapping.map((option) => {
+              if (option.division === formInputs.division) {
+                return option.district.map((item) => (
+                  <MenuItem key={item} value={item}>
+                    {item}
+                  </MenuItem>
+                ));
+              }
+            })}
+          </TextField>
+        </Grid>
+
+        <Grid item xs={12} sm={4}>
+          <TextField
+            label="Area"
+            name="area"
+            fullWidth
+            value={formInputs.area}
+            onChange={handleChange}
+            sx={{ width: '100%' }}
+            size="small"
+            required
+          />
         </Grid>
       </Grid>
 
@@ -294,6 +354,7 @@ const ManageAccount = () => {
           </Button>
         </Box>
       )}
+
       {errorAndSuccessAlert}
       <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
         <Button

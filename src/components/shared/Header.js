@@ -11,9 +11,6 @@ import {
   SwipeableDrawer,
   Avatar,
   Popover,
-  List,
-  ListItemAvatar,
-  CircularProgress,
   Badge,
 } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
@@ -25,27 +22,27 @@ import InputBase from '@mui/material/InputBase';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import { styled, alpha } from '@mui/material/styles';
+import { blueGrey } from '@mui/material/colors';
 
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
 import CreateIcon from '@mui/icons-material/Create';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import LogoutIcon from '@mui/icons-material/Logout';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import ExploreIcon from '@mui/icons-material/Explore';
+import MessageIcon from '@mui/icons-material/Message';
 
 import { useSelector, useDispatch } from 'react-redux';
 import { authActions, notificationActions } from '../../store';
 import ToastMessage from './ToastMessage';
 
-import { deepPurple } from '@mui/material/colors';
+import { yellow, blue } from '@mui/material/colors';
 import axios from 'axios';
 import Spinner from './Spinner';
 import ReactTimeAgo from 'react-time-ago';
-import ConfirmationDialog from './ConfirmationDialog';
 import OrderAcceptDialog, { callOrderAcceptApi } from './OrderAcceptDialog';
 
 const Search = styled('div')(({ theme }) => ({
@@ -83,7 +80,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     transition: theme.transitions.create('width'),
     width: '100%',
     [theme.breakpoints.up('md')]: {
-      width: '275px',
+      width: '325px',
     },
   },
 }));
@@ -210,10 +207,6 @@ const Header = () => {
     setNotificationAnchorEl(null);
   };
 
-  const handleSearchedItemMenu = (e) => {
-    setSearchedItemAnchorEl(e.currentTarget);
-  };
-
   const handleSearchedItemMenuClose = () => {
     setSearchedItems(null);
     setNoSearchItem(false);
@@ -290,15 +283,21 @@ const Header = () => {
       <Box sx={{ mt: 1 }}>
         <Box sx={{ display: 'flex', justifyContent: 'center', my: 1.5 }}>
           <Button onClick={() => handleDrawerClose('/')}>
-            <Typography variant="h6" color="primary">
-              BookNetwork
-            </Typography>
+            <img
+              src="book-exchange-logo.png"
+              alt="logo"
+              width="80"
+              height="80"
+            />
           </Button>
         </Box>
 
         <Divider />
 
-        <ListItem disablePadding>
+        <ListItem
+          disablePadding
+          sx={{ ml: { xs: 1, sm: 3 }, mr: { xs: 1, sm: 7 } }}
+        >
           <ListItemButton onClick={() => handleDrawerClose('/findPost')}>
             <ListItemIcon>
               <ContentPasteSearchIcon color="primary" />
@@ -308,7 +307,10 @@ const Header = () => {
         </ListItem>
         <Divider />
 
-        <ListItem disablePadding>
+        <ListItem
+          disablePadding
+          sx={{ ml: { xs: 1, sm: 3 }, mr: { xs: 1, sm: 7 } }}
+        >
           <ListItemButton onClick={() => handleDrawerClose('/createPost')}>
             <ListItemIcon>
               <CreateIcon color="primary" />
@@ -318,7 +320,10 @@ const Header = () => {
         </ListItem>
         <Divider />
 
-        <ListItem disablePadding>
+        <ListItem
+          disablePadding
+          sx={{ ml: { xs: 1, sm: 3 }, mr: { xs: 1, sm: 7 } }}
+        >
           <ListItemButton onClick={() => handleDrawerClose('/exploreShops')}>
             <ListItemIcon>
               <ExploreIcon color="primary" />
@@ -328,7 +333,10 @@ const Header = () => {
         </ListItem>
         <Divider />
 
-        <ListItem disablePadding>
+        <ListItem
+          disablePadding
+          sx={{ ml: { xs: 1, sm: 3 }, mr: { xs: 1, sm: 7 } }}
+        >
           <ListItemButton onClick={() => handleDrawerClose('/notification')}>
             <ListItemIcon>
               <NotificationsNoneIcon color="primary" />
@@ -338,30 +346,63 @@ const Header = () => {
         </ListItem>
         <Divider />
 
-        <Box sx={{ mt: 2, ml: 3, mr: 8, mb: 2 }}>
-          <Typography variant="h6">My Account</Typography>
+        <ListItem
+          disablePadding
+          sx={{ ml: { xs: 1, sm: 3 }, mr: { xs: 1, sm: 7 } }}
+        >
+          <ListItemButton onClick={() => handleDrawerClose('/messages')}>
+            <ListItemIcon>
+              <MessageIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="Messages" />
+          </ListItemButton>
+        </ListItem>
+        <Divider />
+
+        <Box sx={{ mt: 2, ml: 5, mr: 8, mb: 2 }}>
+          <Typography variant="h6" sx={{ mb: 1, mt: 2.7 }}>
+            My Account
+          </Typography>
 
           <ListItem disablePadding>
-            <ListItemButton onClick={() => handleDrawerClose('/myAccount#0')}>
-              <Typography>Manage Account</Typography>
+            <ListItemButton
+              onClick={() => handleDrawerClose('/myAccount#0')}
+              sx={{ p: 0, pl: 2, pb: 0.8 }}
+            >
+              <ListItemText
+                primary="Manage Account"
+                sx={{ color: 'primary.dark' }}
+              />
             </ListItemButton>
           </ListItem>
 
           <ListItem disablePadding>
-            <ListItemButton onClick={() => handleDrawerClose('/myAccount#1')}>
-              <Typography>My Posts</Typography>
+            <ListItemButton
+              onClick={() => handleDrawerClose('/myAccount#1')}
+              sx={{ p: 0, pl: 2, pb: 0.8 }}
+            >
+              <ListItemText primary="My Posts" sx={{ color: 'primary.dark' }} />
             </ListItemButton>
           </ListItem>
 
           <ListItem disablePadding>
-            <ListItemButton onClick={() => handleDrawerClose('/myAccount#2')}>
-              <Typography>History</Typography>
+            <ListItemButton
+              onClick={() => handleDrawerClose('/myAccount#2')}
+              sx={{ p: 0, pl: 2, pb: 0.8 }}
+            >
+              <ListItemText primary="History" sx={{ color: 'primary.dark' }} />
             </ListItemButton>
           </ListItem>
 
           <ListItem disablePadding>
-            <ListItemButton onClick={() => handleDrawerClose('/myAccount#3')}>
-              <Typography>Saved Items</Typography>
+            <ListItemButton
+              onClick={() => handleDrawerClose('/myAccount#3')}
+              sx={{ p: 0, pl: 2, pb: 0.8 }}
+            >
+              <ListItemText
+                primary="Saved Items"
+                sx={{ color: 'primary.dark' }}
+              />
             </ListItemButton>
           </ListItem>
         </Box>
@@ -376,8 +417,6 @@ const Header = () => {
       const response = await axios.get(
         `${process.env.REACT_APP_BACKEND_URL}/api/posts/byQuery?user=${userId}&limit=10&exchangeOffer=true&sellOffer=true&search=${searchText}`
       );
-      // dispatch(postActions.loadPosts(response.data.posts));
-
       if (response.data.posts.length < 1) {
         setNoSearchItem(true);
         setSearchedItems(null);
@@ -422,37 +461,43 @@ const Header = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed">
+      <AppBar
+        position="fixed"
+        sx={{ bgcolor: blueGrey[900], py: { xs: 0.7, sm: 0 } }}
+      >
         <Toolbar>
           {drawerContent}
+
+          <Box
+            component={RouterLink}
+            to="/"
+            sx={{ pt: 0.5, mx: 5, display: { xs: 'none', sm: 'block' } }}
+          >
+            <img
+              src="book-exchange-logo.png"
+              alt="logo"
+              width="80"
+              height="80"
+            />
+          </Box>
+
           <IconButton
             size="large"
             edge="start"
             color="inherit"
             aria-label="open drawer"
-            sx={{ mr: 2 }}
+            sx={{ mr: { xs: 1, sm: 3 } }}
             onClick={handleDrawerOpen}
           >
             <MenuIcon />
           </IconButton>
-          <Typography
-            variant="h6"
-            sx={{
-              display: { xs: 'none', sm: 'block' },
-              textDecoration: 'inherit',
-              color: 'inherit',
-            }}
-            component={RouterLink}
-            to="/"
-          >
-            BoiExchange
-          </Typography>
+
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
-              placeholder="Search title of writer"
+              placeholder="Search title or writer"
               inputProps={{ 'aria-label': 'search' }}
               onChange={handleSearch}
             />
@@ -461,9 +506,8 @@ const Header = () => {
           <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
             <Button
               variant="text"
-              color="inherit"
-              startIcon={<ContentPasteSearchIcon />}
-              sx={{ mx: 1.5 }}
+              startIcon={<ContentPasteSearchIcon sx={{ color: yellow[600] }} />}
+              sx={{ mx: 1.5, color: blueGrey[50] }}
               component={RouterLink}
               to="/findPost"
             >
@@ -472,28 +516,46 @@ const Header = () => {
             <Button
               variant="text"
               color="inherit"
-              startIcon={<CreateIcon />}
-              sx={{ mx: 1.5 }}
+              startIcon={<CreateIcon sx={{ color: yellow[600] }} />}
+              sx={{ mx: 1.5, color: blueGrey[50] }}
               component={RouterLink}
               to="/createPost"
             >
               Create Post
             </Button>
             {userLoggedIn && (
-              <IconButton
-                aria-label="notification"
-                color="inherit"
-                onClick={handleOpenNotificationMenu}
-              >
-                <Badge
-                  color="error"
-                  badgeContent={
-                    notificationItemsList ? notificationItemsList.length : 0
-                  }
+              <>
+                <IconButton
+                  aria-label="messages"
+                  sx={{ color: blueGrey[50], mx: 1 }}
+                  component={RouterLink}
+                  to="/messages"
                 >
-                  <NotificationsNoneIcon />
-                </Badge>
-              </IconButton>
+                  <Badge
+                    color="error"
+                    badgeContent={
+                      notificationItemsList ? notificationItemsList.length : 0
+                    }
+                  >
+                    <MessageIcon />
+                  </Badge>
+                </IconButton>
+
+                <IconButton
+                  aria-label="notification"
+                  sx={{ color: blueGrey[50], mx: 1 }}
+                  onClick={handleOpenNotificationMenu}
+                >
+                  <Badge
+                    color="error"
+                    badgeContent={
+                      notificationItemsList ? notificationItemsList.length : 0
+                    }
+                  >
+                    <NotificationsNoneIcon />
+                  </Badge>
+                </IconButton>
+              </>
             )}
           </Box>
           <Box sx={{ display: 'flex' }}>
@@ -503,20 +565,20 @@ const Header = () => {
                 sx={{
                   width: 36,
                   height: 36,
-                  bgcolor: deepPurple[500],
                   ml: 2,
                   mr: 2,
+                  bgcolor: blue[700],
+                  color: yellow[600],
                 }}
-                src={`${process.env.REACT_APP_BACKEND_URL}/images/${
+                src={`${process.env.REACT_APP_CLOUD_IMAGE_URL}/${
                   auth && auth.image
                 }`}
                 onClick={handleProfileMenuOpen}
               />
             ) : (
               <Button
-                variant="contained"
-                color="secondary"
-                sx={{ mx: 1.5, px: 2.5, borderRadius: 1 }}
+                variant="outlined"
+                sx={{ mx: 1.5, px: 2, borderRadius: 1, color: yellow[600] }}
                 component={RouterLink}
                 to="/signin"
               >

@@ -18,7 +18,7 @@ const Footer = () => {
         <Typography variant="body2" color="text.secondary">
           {'Copyright © '}
           <Link color="inherit" href="https://mui.com/">
-            Bookmate.com
+            BoiExchange.com
           </Link>{' '}
           {new Date().getFullYear()}
           {'.'}

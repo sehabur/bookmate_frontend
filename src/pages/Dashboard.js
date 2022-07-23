@@ -11,11 +11,12 @@ import {
   Divider,
   Grid,
 } from '@mui/material';
+import { yellow, blue } from '@mui/material/colors';
 
 import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
-import AddBoxIcon from '@mui/icons-material/AddBox';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import CreateIcon from '@mui/icons-material/Create';
 
 import MainCard from '../components/shared/MainCard';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
@@ -96,18 +97,23 @@ const Dashboard = () => {
             textDecoration: 'none',
             display: 'flex',
             alignItems: 'center',
+            bgcolor: blue[700],
           }}
           component={RouterLink}
           to="/findPost"
         >
           <Box sx={{ textAlign: 'center' }}>
-            <ContentPasteSearchIcon color="primary" fontSize="large" />
+            <ContentPasteSearchIcon
+              sx={{ color: yellow[600] }}
+              color="primary"
+              fontSize="large"
+            />
           </Box>
-          <Typography sx={{ ml: 2 }}>
-            Find books of your interest by location and/or category
+          <Typography sx={{ pl: 2, color: 'white' }}>
+            Find books of your interest by category or location
           </Typography>
           <IconButton>
-            <ArrowForwardIosIcon />
+            <ArrowForwardIosIcon sx={{ color: yellow[600] }} />
           </IconButton>
         </Paper>
 
@@ -118,19 +124,20 @@ const Dashboard = () => {
             textDecoration: 'none',
             display: 'flex',
             alignItems: 'center',
+            bgcolor: blue[700],
           }}
           component={RouterLink}
           to="/createPost"
         >
           <Box sx={{ textAlign: 'center' }}>
-            <AddBoxIcon color="primary" fontSize="large" />
+            <CreateIcon fontSize="large" sx={{ color: yellow[600] }} />
           </Box>
 
-          <Typography sx={{ ml: 2 }}>
+          <Typography sx={{ ml: 2, color: 'white' }}>
             Create a post and start sharing books with friends
           </Typography>
           <IconButton>
-            <ArrowForwardIosIcon />
+            <ArrowForwardIosIcon sx={{ color: yellow[600] }} />
           </IconButton>
         </Paper>
 
@@ -141,19 +148,20 @@ const Dashboard = () => {
             textDecoration: 'none',
             display: 'flex',
             alignItems: 'center',
+            bgcolor: blue[700],
           }}
           component={RouterLink}
           to="/myAccount"
         >
           <Box sx={{ textAlign: 'center' }}>
-            <ManageAccountsIcon color="primary" fontSize="large" />
+            <ManageAccountsIcon sx={{ color: yellow[600] }} fontSize="large" />
           </Box>
 
-          <Typography sx={{ ml: 2 }}>
-            Manage your account details, location, favourite books etc.
+          <Typography sx={{ ml: 2, color: 'white' }}>
+            Manage your account details, favorite books etc.
           </Typography>
           <IconButton>
-            <ArrowForwardIosIcon />
+            <ArrowForwardIosIcon sx={{ color: yellow[600] }} />
           </IconButton>
         </Paper>
       </Stack>

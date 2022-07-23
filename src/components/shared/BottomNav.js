@@ -45,7 +45,7 @@ const BottomNav = () => {
           to={bottomNavActions[0]}
         />
         <BottomNavigationAction
-          label="Find Post"
+          label="Find Books"
           icon={<ContentPasteSearchIcon />}
           component={Link}
           to={bottomNavActions[1]}

@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Provider } from 'react-redux';
 
 import { Container, CssBaseline, ThemeProvider, Box } from '@mui/material';
 
@@ -15,13 +16,12 @@ import theme from './context/theme';
 import Footer from './components/shared/Footer';
 import BottomNavCompansator from './components/shared/BottomNavCompansator';
 import PostDetails from './pages/PostDetails';
-
 import store from './store';
-import { Provider } from 'react-redux';
 import EditPost from './pages/EditPost';
 import AllPostByUser from './pages/AllPostByUser';
 import Notification from './pages/Notification';
 import ExploreShops from './pages/ExploreShops';
+import Messages from './pages/Messages';
 
 const App = () => {
   return (
@@ -29,7 +29,7 @@ const App = () => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Container component="main" maxWidth={false} disableGutters>
-          <Box sx={{ maxWidth: '1024px', mx: 'auto', my: 2 }}>
+          <Box sx={{ maxWidth: '1024px', mx: 'auto', my: { xs: 2.5, sm: 5 } }}>
             <BrowserRouter>
               <Header />
               <Routes>
@@ -42,6 +42,7 @@ const App = () => {
                 <Route path="/myAccount" element={<MyAccount />} />
                 <Route path="/notification" element={<Notification />} />
                 <Route path="/exploreShops" element={<ExploreShops />} />
+                <Route path="/messages" element={<Messages />} />
 
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />

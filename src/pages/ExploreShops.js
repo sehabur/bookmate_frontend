@@ -63,7 +63,7 @@ const ExploreShops = () => {
                     <Grid container spacing={2} sx={{ mb: 2 }}>
                       <Grid item>
                         <Avatar
-                          src={`${process.env.REACT_APP_BACKEND_URL}/images/${user.image}`}
+                          src={`${process.env.REACT_APP_CLOUD_IMAGE_URL}/${user.image}`}
                           sx={{
                             width: 50,
                             height: 50,

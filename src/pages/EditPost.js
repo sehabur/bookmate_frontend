@@ -126,12 +126,14 @@ const EditPost = () => {
       setFormInputs({ ...response.data.post, offerType });
 
       setImageUrl({
-        image1: `${process.env.REACT_APP_BACKEND_URL}/images/${response.data.post.image1}`,
+        image1: response.data.post.image1
+          ? `${process.env.REACT_APP_CLOUD_IMAGE_URL}/${response.data.post.image1}`
+          : null,
         image2: response.data.post.image2
-          ? `${process.env.REACT_APP_BACKEND_URL}/images/${response.data.post.image2}`
+          ? `${process.env.REACT_APP_CLOUD_IMAGE_URL}/${response.data.post.image2}`
           : null,
         image3: response.data.post.image3
-          ? `${process.env.REACT_APP_BACKEND_URL}/images/${response.data.post.image3}`
+          ? `${process.env.REACT_APP_CLOUD_IMAGE_URL}/${response.data.post.image3}`
           : null,
       });
 
@@ -195,17 +197,17 @@ const EditPost = () => {
     try {
       setIsLoading(true);
       const fileDeleteResponse = await axios.delete(
-        `${process.env.REACT_APP_BACKEND_URL}/api/posts/file/${imageFileName}`,
+        `${process.env.REACT_APP_BACKEND_URL}/api/posts/deleteFile?fileKey=${imageFileName}`,
         config
       );
 
-      const response = await axios.put(
+      const response = await axios.patch(
         `${process.env.REACT_APP_BACKEND_URL}/api/posts/removeImage/${postId}?image=${imageNum}`,
         {},
         config
       );
 
-      if (response.status === 201 && fileDeleteResponse === 200) {
+      if (response.status === 201 && fileDeleteResponse.status === 200) {
         setFormInputs({
           ...formInputs,
           [imageNum]: null,
@@ -375,6 +377,8 @@ const EditPost = () => {
       });
     }
   };
+
+  console.log(imageUrl);
 
   return (
     <>

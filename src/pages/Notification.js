@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import ReactTimeAgo from 'react-time-ago';
 import axios from 'axios';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { brown } from '@mui/material/colors';
 import { Box, Button, Divider, Paper, Typography } from '@mui/material';
 
@@ -22,9 +22,13 @@ const Notification = () => {
 
   const auth = useSelector((state) => state.auth);
 
+  const userLoggedIn = auth && auth.isLoggedIn;
+
   const notificationItemsList = useSelector((state) => state.notification);
 
   const dispatch = useDispatch();
+
+  const navigate = useNavigate();
 
   const handleDialogClose = (e, action) => {
     if (action === 'confirm') {
@@ -63,6 +67,12 @@ const Notification = () => {
       console.log(error);
     }
   };
+
+  useEffect(() => {
+    if (!userLoggedIn) {
+      navigate('/signin');
+    }
+  }, [navigate, userLoggedIn]);
 
   return (
     <>
