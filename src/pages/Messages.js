@@ -106,6 +106,7 @@ const Messages = ({ callback }) => {
           text: newMessage,
         };
 
+        // Sending message via Socket.io //
         socket.current.emit('sendMessage', newMessageToSend, (response) => {
           isMessageSent = response.status === 'ok' ? true : false;
 
