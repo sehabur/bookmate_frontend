@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Provider } from 'react-redux';
 
@@ -24,12 +25,25 @@ import ExploreShops from './pages/ExploreShops';
 import Messages from './pages/Messages';
 
 const App = () => {
+  const [isMessagePage, setIsMessagePage] = useState(false);
+
+  const messagePageCallback = (status) => {
+    setIsMessagePage(status);
+  };
+
   return (
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <Container component="main" maxWidth={false} disableGutters>
-          <Box sx={{ maxWidth: '1024px', mx: 'auto', my: { xs: 2.5, sm: 5 } }}>
+          <Box
+            sx={{
+              maxWidth: '1024px',
+              mx: 'auto',
+              mt: { xs: 2.5, sm: 5 },
+              mb: { xs: 2.5, sm: 0 },
+            }}
+          >
             <BrowserRouter>
               <Header />
               <Routes>
@@ -42,7 +56,10 @@ const App = () => {
                 <Route path="/myAccount" element={<MyAccount />} />
                 <Route path="/notification" element={<Notification />} />
                 <Route path="/exploreShops" element={<ExploreShops />} />
-                <Route path="/messages" element={<Messages />} />
+                <Route
+                  path="/messages"
+                  element={<Messages callback={messagePageCallback} />}
+                />
 
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />
@@ -52,7 +69,7 @@ const App = () => {
               <BottomNav />
             </BrowserRouter>
           </Box>
-          <Footer />
+          {!isMessagePage && <Footer />}
           <BottomNavCompansator />
         </Container>
       </ThemeProvider>

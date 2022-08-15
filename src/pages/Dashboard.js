@@ -17,6 +17,7 @@ import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CreateIcon from '@mui/icons-material/Create';
+import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 import MainCard from '../components/shared/MainCard';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
@@ -175,17 +176,31 @@ const Dashboard = () => {
           sx={{ display: { xs: 'none', sm: 'block' }, mb: 2 }}
         />
         {posts && posts.length > 0 ? (
-          <Box sx={{ ml: 2 }}>
-            <Grid container>
-              {posts.map((post) => (
-                <Grid Item xs={12} sm={6}>
-                  <Box sx={{ mr: 2, mb: 2 }}>
-                    <MainCard data={post} />
-                  </Box>
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
+          <>
+            <Box sx={{ ml: 2 }}>
+              <Grid container>
+                {posts.map((post) => (
+                  <Grid Item xs={12} sm={6}>
+                    <Box sx={{ mr: 2, mb: 2 }}>
+                      <MainCard data={post} />
+                    </Box>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
+
+            <Box sx={{ textAlign: 'center', mx: 2 }}>
+              <Button
+                variant={matchesSmDown ? 'contained' : 'text'}
+                fullWidth={matchesSmDown}
+                endIcon={<KeyboardArrowRightIcon />}
+                component={RouterLink}
+                to="/findPost"
+              >
+                See more books
+              </Button>
+            </Box>
+          </>
         ) : (
           <Box sx={{ my: 4 }}>
             <Typography textAlign="center" variant="h6">

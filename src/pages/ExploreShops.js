@@ -65,8 +65,8 @@ const ExploreShops = () => {
                         <Avatar
                           src={`${process.env.REACT_APP_CLOUD_IMAGE_URL}/${user.image}`}
                           sx={{
-                            width: 50,
-                            height: 50,
+                            width: 60,
+                            height: 60,
                           }}
                         />
                       </Grid>
@@ -80,7 +80,7 @@ const ExploreShops = () => {
                         </Typography>
 
                         <Typography color="text.secondary">
-                          {user.orders.length} sell/exchange done
+                          {user.exchangedCount} sell/exchange done
                         </Typography>
 
                         {/* <Rating

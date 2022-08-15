@@ -9,7 +9,8 @@ const Footer = () => {
       sx={{
         py: 3,
         px: 2,
-        mt: 'auto',
+        mt: 3,
+
         backgroundColor: grey[400],
       }}
     >

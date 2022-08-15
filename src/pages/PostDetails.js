@@ -21,6 +21,7 @@ import BookmarkAddedIcon from '@mui/icons-material/BookmarkAdded';
 import SellIcon from '@mui/icons-material/Sell';
 import EditIcon from '@mui/icons-material/Edit';
 import SwapCallsIcon from '@mui/icons-material/SwapCalls';
+import noImage from '../assets/no_image_placeholder.jpg';
 
 import Spinner from '../components/shared/Spinner';
 import axios from 'axios';
@@ -83,6 +84,10 @@ const PostDetails = () => {
     if (postDetails.image3) {
       images.push({
         image: `${process.env.REACT_APP_CLOUD_IMAGE_URL}/${postDetails.image3}`,
+      });
+    } else {
+      images.push({
+        image: noImage,
       });
     }
   }
@@ -435,7 +440,7 @@ const PostDetails = () => {
                       </Typography>
 
                       <Typography color="text.secondary">
-                        {postDetails.user.orders.length} sell/exchange done
+                        {postDetails.user.exchangedCount} sell/exchange done
                       </Typography>
 
                       {/* <Rating

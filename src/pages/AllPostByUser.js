@@ -39,7 +39,13 @@ const AllPostByUser = () => {
           <Box sx={{ px: 2, pb: 1, mx: 2, mt: 2 }}>
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid item>
-                <Avatar src="/broken-image.jpg" />
+                <Avatar
+                  src={`${process.env.REACT_APP_CLOUD_IMAGE_URL}/${postsByUser.image}`}
+                  sx={{
+                    width: 60,
+                    height: 60,
+                  }}
+                />
               </Grid>
               <Grid item>
                 <Typography variant="subtitle1">
@@ -51,7 +57,7 @@ const AllPostByUser = () => {
                 </Typography>
 
                 <Typography color="text.secondary">
-                  {postsByUser.orders.length} sell/exchange done
+                  {postsByUser.exchangedCount} sell/exchange done
                 </Typography>
               </Grid>
             </Grid>
@@ -66,19 +72,21 @@ const AllPostByUser = () => {
         {postsByUser && postsByUser.posts.length > 0 ? (
           <Box sx={{ ml: 2 }}>
             <Grid container>
-              {postsByUser.posts.map((post) => (
-                <Grid Item xs={12} sm={6}>
-                  <Box sx={{ mr: 2, mb: 2 }}>
-                    <MainCard data={post} />
-                  </Box>
-                </Grid>
-              ))}
+              {postsByUser.posts
+                .filter((post) => post.isActive === true)
+                .map((post) => (
+                  <Grid Item xs={12} sm={6}>
+                    <Box sx={{ mr: 2, mb: 2 }}>
+                      <MainCard data={post} />
+                    </Box>
+                  </Grid>
+                ))}
             </Grid>
           </Box>
         ) : (
           <Box sx={{ my: 4 }}>
             <Typography textAlign="center" variant="h6">
-              No posts to show
+              No books to show
             </Typography>
           </Box>
         )}

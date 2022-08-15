@@ -11,6 +11,8 @@ import {
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { useParams, Link as RouterLink } from 'react-router-dom';
+import imageCompression from 'browser-image-compression';
+
 import Spinner from '../components/shared/Spinner';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { districtMapping } from '../data/districtMap';
@@ -74,8 +76,6 @@ const EditPost = () => {
     previewUrl2: null,
     previewUrl3: null,
   });
-
-  console.log(formInputs);
 
   const auth = useSelector((state) => state.auth);
 
@@ -174,11 +174,18 @@ const EditPost = () => {
     reader.readAsDataURL(formInputs[fileName]);
   };
 
-  const handleImagePick = (e, newFile) => {
+  const handleImagePick = async (e, newFile) => {
     if (e.target.files) {
+      const imageFile = e.target.files[0];
+      const compressedFile = await imageCompression(imageFile, {
+        maxSizeMB: 0.4,
+        maxWidthOrHeight: 720,
+        useWebWorker: true,
+      });
+
       setFormInputs({
         ...formInputs,
-        [newFile]: e.target.files[0],
+        [newFile]: compressedFile,
       });
     }
   };

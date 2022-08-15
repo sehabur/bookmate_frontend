@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
@@ -15,6 +15,7 @@ import {
   Button,
   Alert,
 } from '@mui/material';
+import imageCompression from 'browser-image-compression';
 
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -22,25 +23,7 @@ import Spinner from '../components/shared/Spinner';
 
 import { districtMapping } from '../data/districtMap';
 import { categories } from '../data/bookCategory';
-
-const formDefaultState = {
-  category: '',
-  writer: '',
-  title: '',
-  description: '',
-  image1: null,
-  image2: null,
-  image3: null,
-  division: '',
-  district: '',
-  area: '',
-  lat: null,
-  long: null,
-  enableExchangeOffer: true,
-  enableSellOffer: true,
-  offerType: 'both',
-  price: '',
-};
+import { authActions } from '../store';
 
 const previewUrlDefaultSet = {
   previewUrl1: null,
@@ -49,6 +32,30 @@ const previewUrlDefaultSet = {
 };
 
 const CreatePost = () => {
+  const dispatch = useDispatch();
+
+  const auth = useSelector((state) => state.auth);
+
+  const formDefaultState = {
+    category: '',
+    writer: '',
+    title: '',
+    description: '',
+    image1: null,
+    image2: null,
+    image3: null,
+    division: auth ? auth.division : '',
+    district: auth ? auth.district : '',
+    area: auth ? auth.area : '',
+    lat: null,
+    long: null,
+    enableExchangeOffer: true,
+    enableSellOffer: true,
+    offerType: 'both',
+    price: '',
+    setLocationDefault: true,
+  };
+
   const [isLoading, setIsLoading] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -60,8 +67,6 @@ const CreatePost = () => {
   const [previewUrl, setPreviewUrl] = useState(previewUrlDefaultSet);
 
   const navigate = useNavigate();
-
-  const auth = useSelector((state) => state.auth);
 
   const userLoggedIn = auth && auth.isLoggedIn;
 
@@ -110,11 +115,18 @@ const CreatePost = () => {
     });
   };
 
-  const handleImagePick = (e, newFile) => {
+  const handleImagePick = async (e, newFile) => {
     if (e.target.files) {
+      const imageFile = e.target.files[0];
+      const compressedFile = await imageCompression(imageFile, {
+        maxSizeMB: 0.4,
+        maxWidthOrHeight: 720,
+        useWebWorker: true,
+      });
+
       setFormInputs({
         ...formInputs,
-        [newFile]: e.target.files[0],
+        [newFile]: compressedFile,
       });
     }
   };
@@ -161,6 +173,12 @@ const CreatePost = () => {
   //   });
   // };
 
+  const handleSetDefaultLocationChange = (e) => {
+    setFormInputs({
+      ...formInputs,
+      setLocationDefault: e.target.checked,
+    });
+  };
   const handlePostSubmit = async (e) => {
     e.preventDefault();
 
@@ -176,6 +194,8 @@ const CreatePost = () => {
       for (let key in formInputs) {
         formData.append(key, formInputs[key]);
       }
+
+      console.log(formInputs);
 
       const config = {
         headers: {
@@ -195,6 +215,14 @@ const CreatePost = () => {
         setFormInputs(formDefaultState);
         setPreviewUrl(previewUrlDefaultSet);
         setIsLoading(false);
+        dispatch(
+          authActions.updateUserLocation({
+            division: formInputs.division,
+            district: formInputs.district,
+            area: formInputs.area,
+          })
+        );
+        setFormInputs(formDefaultState);
       }
     } catch (error) {
       setSuccess(false);
@@ -494,7 +522,7 @@ const CreatePost = () => {
               label="District"
               name="district"
               fullWidth
-              value={formInputs.subCategory}
+              value={formInputs.district}
               onChange={handleChange}
               size="small"
               required
@@ -522,6 +550,18 @@ const CreatePost = () => {
               size="small"
               required
             />
+          </Grid>
+
+          <Grid item xs={12}>
+            <FormGroup>
+              <FormControlLabel
+                control={<Checkbox />}
+                label="set as your default location"
+                color="primary"
+                onChange={handleSetDefaultLocationChange}
+                checked={formInputs.setLocationDefault}
+              />
+            </FormGroup>
           </Grid>
 
           <Grid item xs={12}>

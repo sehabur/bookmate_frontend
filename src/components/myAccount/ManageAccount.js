@@ -10,11 +10,13 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
+import { authActions } from '../../store';
 
 import Spinner from '../shared/Spinner';
 import { districtMapping } from '../../data/districtMap';
+import imageCompression from 'browser-image-compression';
 
 const formDefaultState = {
   shopName: '',
@@ -28,6 +30,8 @@ const formDefaultState = {
 };
 
 const ManageAccount = () => {
+  const dispatch = useDispatch();
+
   const [formInputs, setformInputs] = useState(formDefaultState);
 
   const [isLoading, setIsLoading] = useState(false);
@@ -102,11 +106,17 @@ const ManageAccount = () => {
     }
   }, [formInputs.image]);
 
-  const handleImagePick = (e) => {
+  const handleImagePick = async (e) => {
     if (e.target.files) {
+      const imageFile = e.target.files[0];
+      const compressedFile = await imageCompression(imageFile, {
+        maxSizeMB: 0.4,
+        maxWidthOrHeight: 720,
+        useWebWorker: true,
+      });
       setformInputs({
         ...formInputs,
-        image: e.target.files[0],
+        image: compressedFile,
       });
     }
     setImageUrl(null);
@@ -146,6 +156,13 @@ const ManageAccount = () => {
         setSuccess(true);
         setErrorMessage('');
         setIsLoading(false);
+        dispatch(
+          authActions.updateUserLocation({
+            division: formInputs.division,
+            district: formInputs.district,
+            area: formInputs.area,
+          })
+        );
       }
     } catch (error) {
       setSuccess(false);

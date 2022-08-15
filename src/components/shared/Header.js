@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
+// import { io } from 'socket.io-client';
 
 import {
   Button,
@@ -12,6 +13,7 @@ import {
   Avatar,
   Popover,
   Badge,
+  Chip,
 } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -34,9 +36,10 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 import ExploreIcon from '@mui/icons-material/Explore';
 import MessageIcon from '@mui/icons-material/Message';
+import StorefrontIcon from '@mui/icons-material/Storefront';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { authActions, notificationActions } from '../../store';
+import { authActions, notificationActions, socketActions } from '../../store';
 import ToastMessage from './ToastMessage';
 
 import { yellow, blue } from '@mui/material/colors';
@@ -85,6 +88,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
+// const socket = io.connect(process.env.REACT_APP_BACKEND_URL);
+
 const Header = () => {
   const [profileMenuAnchorEl, setProfileMenuAnchorEl] = useState(null);
 
@@ -109,6 +114,8 @@ const Header = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
 
   const [acceptedOrderNotif, setAcceptedOrderNotif] = useState(null);
+
+  const [newMessageCount, setNewMessageCount] = useState(0);
 
   const navigate = useNavigate();
 
@@ -136,8 +143,26 @@ const Header = () => {
 
   useEffect(() => {
     getNotificationsByUser();
+    getNewMessageCount();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth]);
+
+  const getNewMessageCount = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/orders/newMessageCount/user/${
+          auth && auth.id
+        }`,
+        config
+      );
+      setNewMessageCount(response.data.count);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
 
   const getNotificationsByUser = async () => {
     try {
@@ -179,7 +204,15 @@ const Header = () => {
 
   const handleDrawerClose = (urlPath) => {
     setIsDrawerOpen(false);
-    navigate(urlPath);
+    if (urlPath === '/myShop') {
+      if (userLoggedIn) {
+        navigate(`/allPost/user/${userId}`);
+      } else {
+        navigate('/signin');
+      }
+    } else {
+      navigate(urlPath);
+    }
   };
 
   const handleMyAccountClick = () => {
@@ -254,7 +287,21 @@ const Header = () => {
         Hello, {auth && auth.shopName} !
       </Typography>
       <Divider />
-      <MenuItem onClick={handleMyAccountClick} sx={{ mt: 1.2 }}>
+
+      <MenuItem
+        component={RouterLink}
+        to={`/allPost/user/${userId}`}
+        sx={{ mt: 1.2 }}
+      >
+        <ListItemIcon>
+          <StorefrontIcon color="primary" />
+        </ListItemIcon>
+        <ListItemText>
+          <Typography>My Shop</Typography>
+        </ListItemText>
+      </MenuItem>
+
+      <MenuItem onClick={handleMyAccountClick} sx={{ mt: 0.7 }}>
         <ListItemIcon>
           <ManageAccountsIcon color="primary" />
         </ListItemIcon>
@@ -263,7 +310,7 @@ const Header = () => {
         </ListItemText>
       </MenuItem>
 
-      <MenuItem onClick={handleLogoutClick} sx={{ mb: 0.8 }}>
+      <MenuItem onClick={handleLogoutClick} sx={{ mt: 0.5, mb: 0.8 }}>
         <ListItemIcon>
           <LogoutIcon color="primary" />
         </ListItemIcon>
@@ -341,7 +388,27 @@ const Header = () => {
             <ListItemIcon>
               <NotificationsNoneIcon color="primary" />
             </ListItemIcon>
-            <ListItemText primary="Notifications" />
+            <ListItemText
+              primary={
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Typography sx={{ fontSize: '1rem' }}>
+                    Notifications
+                  </Typography>
+                  {notificationItemsList && notificationItemsList.length > 0 && (
+                    <Chip
+                      label={notificationItemsList.length}
+                      color="error"
+                      size="small"
+                      sx={{
+                        fontSize: '.8rem',
+                        borderRadius: '50%',
+                        ml: 2,
+                      }}
+                    />
+                  )}
+                </Box>
+              }
+            />
           </ListItemButton>
         </ListItem>
         <Divider />
@@ -354,7 +421,38 @@ const Header = () => {
             <ListItemIcon>
               <MessageIcon color="primary" />
             </ListItemIcon>
-            <ListItemText primary="Messages" />
+            <ListItemText
+              primary={
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                  <Typography sx={{ fontSize: '1rem' }}>Messages</Typography>
+                  {newMessageCount > 0 && (
+                    <Chip
+                      label={newMessageCount}
+                      color="error"
+                      size="small"
+                      sx={{
+                        fontSize: '.8rem',
+                        borderRadius: '50%',
+                        ml: 2,
+                      }}
+                    />
+                  )}
+                </Box>
+              }
+            />
+          </ListItemButton>
+        </ListItem>
+        <Divider />
+
+        <ListItem
+          disablePadding
+          sx={{ ml: { xs: 1, sm: 3 }, mr: { xs: 1, sm: 7 } }}
+        >
+          <ListItemButton onClick={() => handleDrawerClose('/myShop')}>
+            <ListItemIcon>
+              <StorefrontIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="My Shop" />
           </ListItemButton>
         </ListItem>
         <Divider />
@@ -531,12 +629,7 @@ const Header = () => {
                   component={RouterLink}
                   to="/messages"
                 >
-                  <Badge
-                    color="error"
-                    badgeContent={
-                      notificationItemsList ? notificationItemsList.length : 0
-                    }
-                  >
+                  <Badge color="error" badgeContent={newMessageCount}>
                     <MessageIcon />
                   </Badge>
                 </IconButton>
@@ -614,6 +707,7 @@ const Header = () => {
             <Box
               sx={{
                 py: 2,
+                minWidth: '280px',
                 maxWidth: '450px',
                 maxHeight: '450px',
               }}

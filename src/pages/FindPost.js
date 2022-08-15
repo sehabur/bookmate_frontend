@@ -31,7 +31,6 @@ import { useNavigate } from 'react-router-dom';
 import { postActions } from '../store';
 import { districtMapping } from '../data/districtMap';
 import { categories } from '../data/bookCategory';
-import SearchBar from 'material-ui-search-bar';
 import SearchIcon from '@mui/icons-material/Search';
 import { blue } from '@mui/material/colors';
 import CloseIcon from '@mui/icons-material/Close';
@@ -96,9 +95,6 @@ const FindPost = () => {
 
   const handleChange = () => {};
 
-  console.log(filterOption);
-  // console.log(sortingText);
-
   const getPostsByQyery = async (sortingText = '', byQuery = '') => {
     try {
       setIsLoading(true);
@@ -114,6 +110,7 @@ const FindPost = () => {
   };
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     getPostsByQyery();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -529,12 +526,6 @@ const FindPost = () => {
                 </Button>
               )}
             </Box>
-
-            {/* <Box sx={{ maxWidth: '520px' }}>
-              <MainCard />
-              <MainCard />
-              <MainCard />
-            </Box> */}
 
             {posts && posts.length > 0 ? (
               <Box sx={{ maxWidth: '520px' }}>
