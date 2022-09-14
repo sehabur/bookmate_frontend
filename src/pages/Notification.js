@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import ReactTimeAgo from 'react-time-ago';
-import axios from 'axios';
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { brown } from '@mui/material/colors';
 import { Box, Button, Divider, Paper, Typography } from '@mui/material';

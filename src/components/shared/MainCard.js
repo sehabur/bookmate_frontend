@@ -45,8 +45,8 @@ const MainCard = ({ data }) => {
         <CardMedia
           component="img"
           sx={{
-            width: { xs: 90, sm: 130 },
-            height: { xs: 120, sm: 160 },
+            width: { xs: 90, sm: 115 },
+            height: { xs: 130, sm: 160 },
             my: { sm: 1.5 },
             ml: 1.5,
           }}

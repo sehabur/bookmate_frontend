@@ -1,43 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Box,
   Button,
   Card,
-  CardActionArea,
   CardContent,
   CardMedia,
-  Chip,
   Divider,
-  Stack,
   Typography,
 } from '@mui/material';
 
-import { teal } from '@mui/material/colors';
-
-import ReactTimeAgo from 'react-time-ago';
-
 import noImage from '../../assets/no_image_placeholder.jpg';
 
-import SellIcon from '@mui/icons-material/Sell';
-import SwapCallsIcon from '@mui/icons-material/SwapCalls';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
-
-import { useSelector } from 'react-redux';
+import { Link as RouterLink } from 'react-router-dom';
 
 import { format } from 'date-fns';
-import axios from 'axios';
-
-import Spinner from './Spinner';
 
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import ClearIcon from '@mui/icons-material/Clear';
 
 const MyPostsCard = ({ data }) => {
-  const auth = useSelector((state) => state.auth);
-
-  const userId = auth ? auth.id : '';
-
   return (
     <Card
       sx={{

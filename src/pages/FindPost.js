@@ -10,7 +10,6 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
-  Stack,
   Button,
   Box,
   Drawer,
@@ -27,13 +26,13 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
 import { postActions } from '../store';
 import { districtMapping } from '../data/districtMap';
 import { categories } from '../data/bookCategory';
 import SearchIcon from '@mui/icons-material/Search';
-import { blue } from '@mui/material/colors';
 import CloseIcon from '@mui/icons-material/Close';
+import Spinner from '../components/shared/Spinner';
+import PaginationCustom from '../components/shared/PaginationCustom';
 
 const sortByOptions = [
   'Date: Newest on top',
@@ -42,10 +41,6 @@ const sortByOptions = [
   'Price: High to low',
   'Price: Low to high',
 ];
-
-const division = ['Dhaka', 'Chittagong'];
-
-const district = ['Dhaka', 'Gazipur'];
 
 const allDistricts = [];
 
@@ -77,11 +72,9 @@ const FindPost = () => {
 
   const [sortedOption, setSortedOption] = useState('Date: Newest on top');
 
-  // const [sortingText, setSortingText] = useState('');
+  const [triggerSortedOption, setTriggerSortedOption] = useState(false);
 
   const [openDrawer, setOpenDrawer] = useState(false);
-
-  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -89,17 +82,17 @@ const FindPost = () => {
 
   const posts = useSelector((state) => state.post);
 
+  const [currentPosts, setCurrentPosts] = useState(null);
+
   const auth = useSelector((state) => state.auth);
 
   const userId = auth ? auth.id : '627bb5ef35ffb019b973d811'; // some random fake id //
-
-  const handleChange = () => {};
 
   const getPostsByQyery = async (sortingText = '', byQuery = '') => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/posts/${byQuery}?user=${userId}&limit=50${sortingText}`
+        `${process.env.REACT_APP_BACKEND_URL}/api/posts/${byQuery}?user=${userId}&limit=60${sortingText}`
       );
       dispatch(postActions.loadPosts(response.data.posts));
       setIsLoading(false);
@@ -114,6 +107,14 @@ const FindPost = () => {
     getPostsByQyery();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (triggerSortedOption) {
+      getPostsByQyery(buildQueryString(), 'byQuery');
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      setTriggerSortedOption(false);
+    }
+  }, [triggerSortedOption]);
 
   const handleToggleDrawer = (state) => {
     setOpenDrawer(state);
@@ -160,7 +161,7 @@ const FindPost = () => {
       ...filterOption.location,
       ...filterOption.offerType,
       search: filterOption.search,
-      category: filterOption.category,
+      category: filterOption.category.replace('&', 'AND'),
     };
     let queryText = '';
     for (let key in reqBody) {
@@ -173,7 +174,6 @@ const FindPost = () => {
 
   const handleFilterOptionSubmit = async () => {
     setOpenDrawer(false);
-    // setSortingText(buildQueryString());
     getPostsByQyery(buildQueryString(), 'byQuery');
   };
 
@@ -181,6 +181,8 @@ const FindPost = () => {
     setSortedOption(e.target.value);
 
     const sortedOptionIndex = sortByOptions.indexOf(e.target.value);
+
+    console.log(sortedOptionIndex);
 
     let text;
     switch (sortedOptionIndex) {
@@ -190,9 +192,6 @@ const FindPost = () => {
       case 1:
         text = 'date=asc';
         break;
-      // case 2:
-      //   text = 'date=desc';
-      //   break;
       case 2:
         text = 'price=desc';
         break;
@@ -206,8 +205,7 @@ const FindPost = () => {
       ...filterOption,
       sortBy: text,
     });
-    // setSortingText(buildQueryString());
-    getPostsByQyery(buildQueryString(), 'byQuery');
+    setTriggerSortedOption(true);
   };
 
   const handleSearchInput = (e) => {
@@ -217,9 +215,12 @@ const FindPost = () => {
     });
   };
 
+  const selectCurrentItems = (currentItems) => {
+    window.scrollTo(0, 0);
+    setCurrentPosts(currentItems);
+  };
+
   const handleSearch = () => {
-    // const text = '&search=' + filterOption.search;
-    // setSortingText(buildQueryString());
     getPostsByQyery(buildQueryString(), 'byQuery');
   };
 
@@ -424,6 +425,8 @@ const FindPost = () => {
 
   return (
     <Paper sx={{ py: 2 }}>
+      <Spinner open={isLoading} />
+
       <Drawer
         anchor="bottom"
         open={openDrawer}
@@ -529,11 +532,20 @@ const FindPost = () => {
 
             {posts && posts.length > 0 ? (
               <Box sx={{ maxWidth: '520px' }}>
-                {posts.map((post) => (
-                  <Box sx={{ m: 2 }}>
-                    <MainCard data={post} />
-                  </Box>
-                ))}
+                {currentPosts &&
+                  currentPosts.map((post) => (
+                    <Box sx={{ m: 2 }}>
+                      <MainCard data={post} />
+                    </Box>
+                  ))}
+
+                <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                  <PaginationCustom
+                    itemsArray={posts}
+                    itemsPerPage={15}
+                    selectCurrentItems={selectCurrentItems}
+                  />
+                </Box>
               </Box>
             ) : (
               <Box sx={{ my: 4 }}>

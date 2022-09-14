@@ -20,7 +20,7 @@ import CreateIcon from '@mui/icons-material/Create';
 import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
 import MainCard from '../components/shared/MainCard';
-import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
 import { postActions } from '../store';
@@ -34,8 +34,6 @@ const Dashboard = () => {
 
   const matchesSmDown = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const navigate = useNavigate();
-
   const dispatch = useDispatch();
 
   const posts = useSelector((state) => state.post);
@@ -48,7 +46,7 @@ const Dashboard = () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/posts?user=${userId}&limit=10`
+        `${process.env.REACT_APP_BACKEND_URL}/api/posts?user=${userId}&limit=12`
       );
 
       dispatch(postActions.loadPosts(response.data.posts));

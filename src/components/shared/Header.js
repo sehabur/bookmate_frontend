@@ -39,7 +39,7 @@ import MessageIcon from '@mui/icons-material/Message';
 import StorefrontIcon from '@mui/icons-material/Storefront';
 
 import { useSelector, useDispatch } from 'react-redux';
-import { authActions, notificationActions, socketActions } from '../../store';
+import { authActions, notificationActions } from '../../store';
 import ToastMessage from './ToastMessage';
 
 import { yellow, blue } from '@mui/material/colors';
@@ -220,6 +220,11 @@ const Header = () => {
     navigate('/myAccount');
   };
 
+  const handleMyShopClick = () => {
+    handleProfileMenuClose();
+    navigate(`/allPost/user/${userId}`);
+  };
+
   const handleLogoutClick = () => {
     handleProfileMenuClose();
     localStorage.removeItem('userInfo');
@@ -288,11 +293,7 @@ const Header = () => {
       </Typography>
       <Divider />
 
-      <MenuItem
-        component={RouterLink}
-        to={`/allPost/user/${userId}`}
-        sx={{ mt: 1.2 }}
-      >
+      <MenuItem onClick={handleMyShopClick} sx={{ mt: 1.2 }}>
         <ListItemIcon>
           <StorefrontIcon color="primary" />
         </ListItemIcon>
@@ -569,13 +570,13 @@ const Header = () => {
           <Box
             component={RouterLink}
             to="/"
-            sx={{ pt: 0.5, mx: 5, display: { xs: 'none', sm: 'block' } }}
+            sx={{ pt: 1, mx: 5, display: { xs: 'none', sm: 'block' } }}
           >
             <img
               src="book-exchange-logo.png"
               alt="logo"
-              width="80"
-              height="80"
+              width="70"
+              height="70"
             />
           </Box>
 

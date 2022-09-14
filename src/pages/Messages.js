@@ -242,7 +242,7 @@ const Messages = ({ callback }) => {
         setConversationList(modifiedConversationLists);
       });
     }
-  }, []);
+  }, [auth]);
 
   useEffect(() => {
     if (arrivalMessage) {

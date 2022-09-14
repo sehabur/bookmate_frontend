@@ -21,6 +21,7 @@ import imageCompression from 'browser-image-compression';
 const formDefaultState = {
   shopName: '',
   email: '',
+  phoneNo: '',
   firstName: '',
   lastName: '',
   image: null,
@@ -79,7 +80,8 @@ const ManageAccount = () => {
         firstName: userRespose.data.user.firstName || '',
         lastName: userRespose.data.user.lastName || '',
         email: userRespose.data.user.email,
-        image: userRespose.data.user.image,
+        phoneNo: userRespose.data.user.phoneNo || '',
+        image: userRespose.data.user.image || null,
         division: userRespose.data.user.division || '',
         district: userRespose.data.user.district || '',
         area: userRespose.data.user.area || '',
@@ -211,7 +213,7 @@ const ManageAccount = () => {
         onSubmit={handleSubmit}
         sx={{ mb: 2 }}
       >
-        <Grid item xs={12} sm={6}>
+        <Grid item xs={12} sm={12}>
           <TextField
             label="Shop Name"
             name="shopName"
@@ -221,6 +223,7 @@ const ManageAccount = () => {
             onChange={handleChange}
           ></TextField>
         </Grid>
+
         <Grid item xs={12} sm={6}>
           <TextField
             label="E-mail"
@@ -228,6 +231,16 @@ const ManageAccount = () => {
             fullWidth
             value={formInputs.email}
             inputProps={{ readOnly: true }}
+            onChange={handleChange}
+          ></TextField>
+        </Grid>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            label="Phone Number"
+            name="phoneNo"
+            type="number"
+            fullWidth
+            value={formInputs.phoneNo}
             onChange={handleChange}
           ></TextField>
         </Grid>

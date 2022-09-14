@@ -5,6 +5,11 @@ import {
   Chip,
   Divider,
   Grid,
+  IconButton,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
   Paper,
   Stack,
   Typography,
@@ -12,7 +17,7 @@ import {
   useTheme,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { useParams, Link as RouterLink } from 'react-router-dom';
+import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 
 import { Carousel } from 'react-carousel-minimal';
 
@@ -21,6 +26,8 @@ import BookmarkAddedIcon from '@mui/icons-material/BookmarkAdded';
 import SellIcon from '@mui/icons-material/Sell';
 import EditIcon from '@mui/icons-material/Edit';
 import SwapCallsIcon from '@mui/icons-material/SwapCalls';
+import CallIcon from '@mui/icons-material/Call';
+import MessageIcon from '@mui/icons-material/Message';
 import noImage from '../assets/no_image_placeholder.jpg';
 
 import Spinner from '../components/shared/Spinner';
@@ -36,6 +43,8 @@ import { bdtSign } from '../data/constants';
 
 const PostDetails = () => {
   const { id: postId } = useParams();
+
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -203,6 +212,32 @@ const PostDetails = () => {
         severity: 'error',
         message: `Your ${offerType} request placement failed. Please try again.`,
       });
+      setIsLoading(false);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.post(
+        `${process.env.REACT_APP_BACKEND_URL}/api/orders/createNewConversation`,
+        {
+          senderId: auth.id,
+          receiverId: postDetails.user._id,
+        },
+        config
+      );
+      if (response.status === 201) {
+        navigate('/messages');
+      }
+      setIsLoading(false);
+    } catch (error) {
+      setToastOpen(true);
+      setToastMessage({
+        severity: 'error',
+        message: 'Please login to send message.',
+      });
+
       setIsLoading(false);
     }
   };
@@ -442,15 +477,59 @@ const PostDetails = () => {
                       <Typography color="text.secondary">
                         {postDetails.user.exchangedCount} sell/exchange done
                       </Typography>
-
-                      {/* <Rating
-                      name="read-only"
-                      value={5}
-                      readOnly
-                      sx={{ my: 1 }}
-                    /> */}
                     </Grid>
                   </Grid>
+
+                  <List>
+                    {postDetails.user.phoneNo && (
+                      <ListItem
+                        sx={{
+                          border: '1px solid #ccc',
+                          borderRadius: 1.3,
+                          mb: 2,
+                        }}
+                        secondaryAction={
+                          <IconButton
+                            edge="start"
+                            color="primary"
+                            disableRipple
+                          >
+                            <CallIcon />
+                          </IconButton>
+                        }
+                      >
+                        <ListItemText
+                          primary="Call the owner"
+                          secondary={postDetails.user.phoneNo}
+                        />
+                      </ListItem>
+                    )}
+
+                    <ListItem
+                      sx={{
+                        border: '1px solid #ccc',
+                        borderRadius: 1.3,
+                        mb: 1,
+                      }}
+                      secondaryAction={
+                        <IconButton
+                          edge="start"
+                          color="primary"
+                          onClick={handleSendMessage}
+                        >
+                          <MessageIcon />
+                        </IconButton>
+                      }
+                    >
+                      <ListItemText
+                        primary="Send message"
+                        secondary="via BoiExchange"
+                      />
+                    </ListItem>
+                  </List>
+
+                  <Divider />
+
                   <Button
                     variant="contained"
                     fullWidth
