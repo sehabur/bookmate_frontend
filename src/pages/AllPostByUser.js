@@ -2,6 +2,7 @@ import {
   Avatar,
   Box,
   Button,
+  ClickAwayListener,
   Grid,
   IconButton,
   List,
@@ -25,6 +26,8 @@ import { useSelector } from 'react-redux';
 import ToastMessage from '../components/shared/ToastMessage';
 
 const AllPostByUser = () => {
+  const [tooltipOpen, setTooltipOpen] = React.useState(false);
+
   const { id: userId } = useParams();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -41,6 +44,14 @@ const AllPostByUser = () => {
   });
 
   const navigate = useNavigate();
+
+  const handleTooltipClose = () => {
+    setTooltipOpen(false);
+  };
+
+  const handleTooltipOpen = () => {
+    setTooltipOpen(true);
+  };
 
   const getPostsByUser = async () => {
     try {
@@ -103,7 +114,7 @@ const AllPostByUser = () => {
       <Spinner open={isLoading} />
       <Paper sx={{ mt: 2, py: 2 }}>
         {postsByUser && (
-          <Box sx={{ px: 2, pb: 1, mx: 2, mt: 2, mb: 4 }}>
+          <Box sx={{ px: 2, pb: 1, mx: 2, mt: 2, mb: 2 }}>
             <Grid container spacing={2} sx={{ mb: 2 }}>
               <Grid item>
                 <Avatar
@@ -139,42 +150,54 @@ const AllPostByUser = () => {
               </Grid>
             </Grid>
 
-            <Button
-              variant="outlined"
-              startIcon={<MessageIcon />}
-              onClick={handleSendMessage}
-            >
-              Send message via BoiExchange
-            </Button>
+            {auth && userId !== auth.id && (
+              <Button
+                variant="outlined"
+                startIcon={<MessageIcon />}
+                onClick={handleSendMessage}
+              >
+                Send message via BoiExchange
+              </Button>
+            )}
           </Box>
         )}
-        <Box
-          sx={{
-            display: 'flex',
-            alignItems: 'center',
-            px: 3,
-            pb: 2,
-          }}
-        >
-          <Typography variant="h5" sx={{ fontSize: '1.1rem', pr: 3 }}>
+
+        <Box sx={{ mb: 2 }}>
+          <Typography variant="h5" sx={{ fontSize: '1.1rem', px: 3 }}>
             Books from {postsByUser && postsByUser.shopName}
           </Typography>
 
           {auth && userId === auth.id && (
-            <Tooltip
-              sx={{}}
-              title={
-                <Box sx={{ fontSize: '.8rem' }}>
-                  You can copy URL of this page and share it with your friends
-                  as your Shop's link
-                </Box>
-              }
-              arrow
-            >
-              <Button variant="text" startIcon={<InfoIcon />}>
-                Share Link of your Shop
-              </Button>
-            </Tooltip>
+            <ClickAwayListener onClickAway={handleTooltipClose}>
+              <div>
+                <Tooltip
+                  PopperProps={{
+                    disablePortal: true,
+                  }}
+                  onClose={handleTooltipClose}
+                  open={tooltipOpen}
+                  disableFocusListener
+                  disableHoverListener
+                  disableTouchListener
+                  title={
+                    <Box sx={{ fontSize: '.9rem', p: 0.4 }}>
+                      You can copy URL of this page and share it with your
+                      friends as your Shop's link
+                    </Box>
+                  }
+                  arrow
+                  sx={{ px: 3.3 }}
+                >
+                  <Button
+                    variant="text"
+                    startIcon={<InfoIcon />}
+                    onClick={handleTooltipOpen}
+                  >
+                    Share Link of your Shop
+                  </Button>
+                </Tooltip>
+              </div>
+            </ClickAwayListener>
           )}
         </Box>
 

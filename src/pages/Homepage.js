@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { useLocation, Link as RouterLink } from 'react-router-dom';
+
+import LatestBooks from '../components/Homepage.js/LatestBooks';
+import NearestBooks from '../components/Homepage.js/NearestBooks';
+
 import {
-  Button,
+  Tabs,
+  Tab,
   Paper,
   Stack,
   Typography,
@@ -8,8 +14,6 @@ import {
   useMediaQuery,
   Box,
   IconButton,
-  Divider,
-  Grid,
 } from '@mui/material';
 import { yellow, blue } from '@mui/material/colors';
 
@@ -17,55 +21,54 @@ import ContentPasteSearchIcon from '@mui/icons-material/ContentPasteSearch';
 import ManageAccountsIcon from '@mui/icons-material/ManageAccounts';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CreateIcon from '@mui/icons-material/Create';
-import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 
-import MainCard from '../components/shared/MainCard';
-import { Link as RouterLink } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import axios from 'axios';
-import { postActions } from '../store';
+const tabItems = [
+  {
+    title: 'Latest Books',
+    component: <LatestBooks />,
+  },
+  {
+    title: 'Nearest Books',
+    component: <NearestBooks />,
+  },
+];
 
-import Spinner from '../components/shared/Spinner';
+const TabPanel = (props) => {
+  const { children, value, index, ...other } = props;
 
-const Dashboard = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  return (
+    <Box
+      role="tabpanel"
+      hidden={value !== index}
+      id={`simple-tabpanel-${index}`}
+      aria-labelledby={`simple-tab-${index}`}
+      {...other}
+    >
+      {value === index && <Box sx={{ py: 2 }}>{children}</Box>}
+    </Box>
+  );
+};
+
+const Homepage = () => {
+  const location = useLocation();
 
   const theme = useTheme();
 
   const matchesSmDown = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const dispatch = useDispatch();
+  const [value, setValue] = useState(0);
 
-  const posts = useSelector((state) => state.post);
-
-  const auth = useSelector((state) => state.auth);
-
-  const userId = auth ? auth.id : '627bb5ef35ffb019b973d811'; // some random fake id //
-
-  const getRecentPosts = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/posts?user=${userId}&limit=12`
-      );
-
-      dispatch(postActions.loadPosts(response.data.posts));
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-      console.log(error);
-    }
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
   };
 
   useEffect(() => {
-    getRecentPosts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const tabIndex = location.hash ? Number(location.hash.replace('#', '')) : 0;
+    setValue(tabIndex);
+  }, [location]);
 
   return (
-    <Box>
-      <Spinner open={isLoading} />
-
+    <>
       {/* GPS work. will do later */}
       {/* <Paper sx={{ px: 2, py: 1.5, mb: 2 }}>
         <Stack
@@ -87,7 +90,7 @@ const Dashboard = () => {
         direction={matchesSmDown ? 'column' : 'row'}
         justifyContent={matchesSmDown ? 'center' : 'space-between'}
         alignItems="stretch"
-        sx={{ display: { xs: 'none', sm: 'flex' } }}
+        sx={{ display: { xs: 'none', sm: 'flex' }, mb: 2 }}
       >
         <Paper
           sx={{
@@ -165,50 +168,31 @@ const Dashboard = () => {
         </Paper>
       </Stack>
 
-      <Paper sx={{ mt: { sm: 2, xs: 0 }, py: 2 }}>
-        <Typography variant="h5" sx={{ px: 2, pb: 1, fontSize: '1.3rem' }}>
-          Latest Books
-        </Typography>
-        <Divider
-          variant="middle"
-          sx={{ display: { xs: 'none', sm: 'block' }, mb: 2 }}
-        />
-        {posts && posts.length > 0 ? (
-          <>
-            <Box sx={{ ml: 2 }}>
-              <Grid container>
-                {posts.map((post) => (
-                  <Grid Item xs={12} sm={6}>
-                    <Box sx={{ mr: 2, mb: 2 }}>
-                      <MainCard data={post} />
-                    </Box>
-                  </Grid>
-                ))}
-              </Grid>
-            </Box>
-
-            <Box sx={{ textAlign: 'center', mx: 2 }}>
-              <Button
-                variant={matchesSmDown ? 'contained' : 'text'}
-                fullWidth={matchesSmDown}
-                endIcon={<KeyboardArrowRightIcon />}
-                component={RouterLink}
-                to="/findPost"
-              >
-                See more books
-              </Button>
-            </Box>
-          </>
-        ) : (
-          <Box sx={{ my: 4 }}>
-            <Typography textAlign="center" variant="h6">
-              No books to show
-            </Typography>
-          </Box>
-        )}
+      <Paper sx={{ width: '100%' }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs
+            value={value}
+            onChange={handleChange}
+            aria-label="basic tabs example"
+            variant={matchesSmDown && 'fullWidth'}
+          >
+            {tabItems.map((item) => (
+              <Tab
+                key={item.title}
+                label={item.title}
+                sx={{ textTransform: 'none', fontSize: '1rem' }}
+              />
+            ))}
+          </Tabs>
+        </Box>
+        {tabItems.map((item, index) => (
+          <TabPanel value={value} index={index}>
+            {item.component}
+          </TabPanel>
+        ))}
       </Paper>
-    </Box>
+    </>
   );
 };
 
-export default Dashboard;
+export default Homepage;

@@ -92,7 +92,7 @@ const FindPost = () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/posts/${byQuery}?user=${userId}&limit=60${sortingText}`
+        `${process.env.REACT_APP_BACKEND_URL}/api/posts/${byQuery}?type=latest&user=${userId}&limit=60${sortingText}`
       );
       dispatch(postActions.loadPosts(response.data.posts));
       setIsLoading(false);

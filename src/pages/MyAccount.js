@@ -89,7 +89,7 @@ const MyAccount = () => {
         </Tabs>
       </Box>
       {tabItems.map((item, index) => (
-        <TabPanel key={index} value={value} index={index}>
+        <TabPanel value={value} index={index}>
           {item.component}
         </TabPanel>
       ))}

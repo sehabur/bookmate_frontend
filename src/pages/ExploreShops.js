@@ -70,7 +70,7 @@ const ExploreShops = () => {
                           }}
                         />
                       </Grid>
-                      <Grid item>
+                      <Grid item xs>
                         <Typography variant="subtitle1" sx={{ mb: 0.5 }}>
                           {user.shopName}
                         </Typography>

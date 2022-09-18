@@ -5,7 +5,7 @@ import { Provider } from 'react-redux';
 import { Container, CssBaseline, ThemeProvider, Box } from '@mui/material';
 
 import NotFound from './pages/NotFound';
-import Dashboard from './pages/Dashboard';
+import Homepage from './pages/Homepage';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import FindPost from './pages/FindPost';
@@ -47,7 +47,7 @@ const App = () => {
             <BrowserRouter>
               <Header />
               <Routes>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/" element={<Homepage />} />
                 <Route path="/post/:id" element={<PostDetails />} />
                 <Route path="/allPost/user/:id" element={<AllPostByUser />} />
                 <Route path="/findPost" element={<FindPost />} />
