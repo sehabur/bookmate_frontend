@@ -150,7 +150,7 @@ const AllPostByUser = () => {
               </Grid>
             </Grid>
 
-            {auth && userId !== auth.id && (
+            {userId !== (auth && auth.id) && (
               <Button
                 variant="outlined"
                 startIcon={<MessageIcon />}

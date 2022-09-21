@@ -386,7 +386,7 @@ const ManageAccount = () => {
       )}
 
       {errorAndSuccessAlert}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 4 }}>
         <Button
           variant="contained"
           type="submit"
@@ -397,7 +397,15 @@ const ManageAccount = () => {
         </Button>
       </Box>
       <Divider sx={{ my: 2 }} />
-      <RouterLink to="/change-password">Change Password</RouterLink>
+      <Box sx={{ my: 4 }}>
+        <Button
+          variant="outlined"
+          component={RouterLink}
+          to="/managePassword/change"
+        >
+          Change your account password
+        </Button>
+      </Box>
     </Box>
   );
 };

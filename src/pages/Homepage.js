@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, Link as RouterLink } from 'react-router-dom';
 
-import LatestBooks from '../components/Homepage.js/LatestBooks';
-import NearestBooks from '../components/Homepage.js/NearestBooks';
+import LatestBooks from '../components/homepage/LatestBooks';
+import NearestBooks from '../components/homepage/NearestBooks';
 
 import {
   Tabs,

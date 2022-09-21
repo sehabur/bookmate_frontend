@@ -84,10 +84,17 @@ const NearestBooks = () => {
       ) : (
         <Box sx={{ my: 4, textAlign: 'center', px: 3 }}>
           <ErrorOutlineIcon sx={{ color: 'gray', fontSize: '2.5rem' }} />
-          <Typography sx={{ color: 'gray', fontSize: '1rem' }}>
-            Please login and set your address from "My Account" section to see
-            your nearest books
-          </Typography>
+          {auth && auth.district ? (
+            <Typography sx={{ color: 'gray', fontSize: '1rem' }}>
+              No books found in your district. You can search more books from
+              "Find Books" section.
+            </Typography>
+          ) : (
+            <Typography sx={{ color: 'gray', fontSize: '1rem' }}>
+              Please login and set your address from "My Account" section to see
+              your nearest books
+            </Typography>
+          )}
         </Box>
       )}
     </Box>

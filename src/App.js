@@ -23,6 +23,7 @@ import AllPostByUser from './pages/AllPostByUser';
 import Notification from './pages/Notification';
 import ExploreShops from './pages/ExploreShops';
 import Messages from './pages/Messages';
+import ManagePassword from './pages/ManagePassword';
 
 const App = () => {
   const [isMessagePage, setIsMessagePage] = useState(false);
@@ -63,6 +64,10 @@ const App = () => {
 
                 <Route path="/signin" element={<SignIn />} />
                 <Route path="/signup" element={<SignUp />} />
+                <Route
+                  path="/managePassword/:type"
+                  element={<ManagePassword />}
+                />
 
                 <Route path="*" element={<NotFound />} />
               </Routes>

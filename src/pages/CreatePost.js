@@ -119,8 +119,8 @@ const CreatePost = () => {
     if (e.target.files) {
       const imageFile = e.target.files[0];
       const compressedFile = await imageCompression(imageFile, {
-        maxSizeMB: 0.4,
-        maxWidthOrHeight: 720,
+        maxSizeMB: 0.25,
+        maxWidthOrHeight: 560,
         useWebWorker: true,
       });
 

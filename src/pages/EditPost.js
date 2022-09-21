@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { useParams, Link as RouterLink } from 'react-router-dom';
+import { useParams, Link as RouterLink, useNavigate } from 'react-router-dom';
 import imageCompression from 'browser-image-compression';
 
 import Spinner from '../components/shared/Spinner';
@@ -43,6 +43,8 @@ const formDefaultState = {
 
 const EditPost = () => {
   const { id: postId } = useParams();
+
+  const navigate = useNavigate();
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -78,6 +80,8 @@ const EditPost = () => {
   });
 
   const auth = useSelector((state) => state.auth);
+
+  const userLoggedIn = auth && auth.isLoggedIn;
 
   const config = {
     headers: {
@@ -385,7 +389,11 @@ const EditPost = () => {
     }
   };
 
-  console.log(imageUrl);
+  useEffect(() => {
+    if (!userLoggedIn) {
+      navigate('/signin?redirect=createPost');
+    }
+  }, [navigate, userLoggedIn]);
 
   return (
     <>

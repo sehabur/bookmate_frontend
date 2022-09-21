@@ -148,7 +148,7 @@ const SignIn = ({ redirect }) => {
           </Button>
           <Grid container justifyContent="space-between">
             <Grid item sx={{ mb: { xs: 2, sm: 0 } }}>
-              <Link component={RouterLink} to="#">
+              <Link component={RouterLink} to="/managePassword/resetLink">
                 <Typography>Forgot password?</Typography>
               </Link>
             </Grid>
