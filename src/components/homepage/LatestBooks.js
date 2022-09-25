@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import axios from 'axios';
@@ -35,21 +35,20 @@ const LatestBooks = () => {
     try {
       setIsLoading(true);
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/posts?type=latest&user=${userId}&limit=12`
+        `${process.env.REACT_APP_BACKEND_URL}/api/posts?type=latest&user=${userId}&limit=10`
       );
 
       dispatch(postActions.loadPosts(response.data.posts));
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
-      console.log(error);
     }
   };
 
   useEffect(() => {
     getRecentPosts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [userId]);
 
   return (
     <Box>

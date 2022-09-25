@@ -119,7 +119,7 @@ const CreatePost = () => {
     if (e.target.files) {
       const imageFile = e.target.files[0];
       const compressedFile = await imageCompression(imageFile, {
-        maxSizeMB: 0.25,
+        maxSizeMB: 0.08,
         maxWidthOrHeight: 560,
         useWebWorker: true,
       });
@@ -135,7 +135,7 @@ const CreatePost = () => {
     const { name, value } = e.target;
     setFormInputs({
       ...formInputs,
-      [name]: value,
+      [name]: value.trim(),
     });
   };
 

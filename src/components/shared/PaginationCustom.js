@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import Pagination from '@mui/material/Pagination';
 
-const PaginationCustom = ({ itemsArray, itemsPerPage, selectCurrentItems }) => {
+const PaginationCustom = ({
+  itemsArray,
+  itemsPerPage,
+  selectCurrentItems,
+  imageCachingDisable,
+}) => {
   const [currentItems, setCurrentItems] = useState(null);
   const [pageCount, setPageCount] = useState(0);
   const [itemOffset, setItemOffset] = useState(0);
@@ -19,6 +24,7 @@ const PaginationCustom = ({ itemsArray, itemsPerPage, selectCurrentItems }) => {
   const handlePageClick = (event, page) => {
     const newOffset = page * itemsPerPage - itemsPerPage;
     setItemOffset(newOffset);
+    imageCachingDisable(true);
   };
 
   return (

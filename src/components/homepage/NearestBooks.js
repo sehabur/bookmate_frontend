@@ -29,12 +29,12 @@ const NearestBooks = () => {
 
   const matchesSmDown = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const getNeaestPosts = async () => {
+  const getNearestPosts = async () => {
     try {
       if (userId) {
         setIsLoading(true);
         const response = await axios.get(
-          `${process.env.REACT_APP_BACKEND_URL}/api/posts?type=nearest&user=${userId}&limit=18`
+          `${process.env.REACT_APP_BACKEND_URL}/api/posts?type=nearest&user=${userId}&limit=16`
         );
 
         setPosts(response.data.posts);
@@ -47,7 +47,7 @@ const NearestBooks = () => {
   };
 
   useEffect(() => {
-    getNeaestPosts();
+    getNearestPosts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

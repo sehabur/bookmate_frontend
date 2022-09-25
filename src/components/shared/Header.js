@@ -149,15 +149,15 @@ const Header = () => {
 
   const getNewMessageCount = async () => {
     try {
-      setIsLoading(true);
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/orders/newMessageCount/user/${
-          auth && auth.id
-        }`,
-        config
-      );
-      setNewMessageCount(response.data.count);
-      setIsLoading(false);
+      if (auth) {
+        setIsLoading(true);
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/orders/newMessageCount/user/${auth.id}`,
+          config
+        );
+        setNewMessageCount(response.data.count);
+        setIsLoading(false);
+      }
     } catch (error) {
       setIsLoading(false);
       console.log(error);
@@ -166,17 +166,17 @@ const Header = () => {
 
   const getNotificationsByUser = async () => {
     try {
-      setIsLoading(true);
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/orders/notification/user/${
-          auth && auth.id
-        }`,
-        config
-      );
-      dispatch(
-        notificationActions.loadNotifications(response.data.notification)
-      );
-      setIsLoading(false);
+      if (auth) {
+        setIsLoading(true);
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/orders/notification/user/${auth.id}`,
+          config
+        );
+        dispatch(
+          notificationActions.loadNotifications(response.data.notification)
+        );
+        setIsLoading(false);
+      }
     } catch (error) {
       setIsLoading(false);
       console.log(error);
@@ -512,17 +512,19 @@ const Header = () => {
 
   const getPostsBySearchQyery = async () => {
     try {
-      setIsLoading(true);
-      const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/posts/byQuery?user=${userId}&limit=10&exchangeOffer=true&sellOffer=true&search=${searchText}`
-      );
-      if (response.data.posts.length < 1) {
-        setNoSearchItem(true);
-        setSearchedItems(null);
-      } else {
-        setSearchedItems(response.data.posts);
+      if (searchText) {
+        setIsLoading(true);
+        const response = await axios.get(
+          `${process.env.REACT_APP_BACKEND_URL}/api/posts/byQuery?user=${userId}&limit=10&exchangeOffer=true&sellOffer=true&search=${searchText}`
+        );
+        if (response.data.posts.length < 1) {
+          setNoSearchItem(true);
+          setSearchedItems(null);
+        } else {
+          setSearchedItems(response.data.posts);
+        }
+        setIsLoading(false);
       }
-      setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
       console.log(error);

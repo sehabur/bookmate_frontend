@@ -84,6 +84,8 @@ const FindPost = () => {
 
   const [currentPosts, setCurrentPosts] = useState(null);
 
+  const [imageCachingDisableKey, setImageCachingDisableKey] = useState(false);
+
   const auth = useSelector((state) => state.auth);
 
   const userId = auth ? auth.id : '627bb5ef35ffb019b973d811'; // some random fake id //
@@ -105,6 +107,7 @@ const FindPost = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     getPostsByQyery();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -121,6 +124,15 @@ const FindPost = () => {
   };
 
   const handleRadioChange = (event) => {
+    setFilterOption({
+      ...filterOption,
+      location: {
+        division: null,
+        district: null,
+        area: null,
+      },
+    });
+
     setRadioValue(event.target.value);
   };
 
@@ -161,7 +173,8 @@ const FindPost = () => {
       ...filterOption.location,
       ...filterOption.offerType,
       search: filterOption.search,
-      category: filterOption.category.replace('&', 'AND'),
+      category:
+        filterOption.category && filterOption.category.replace('&', 'AND'),
     };
     let queryText = '';
     for (let key in reqBody) {
@@ -206,6 +219,7 @@ const FindPost = () => {
       sortBy: text,
     });
     setTriggerSortedOption(true);
+    setOpenDrawer(false);
   };
 
   const handleSearchInput = (e) => {
@@ -217,11 +231,16 @@ const FindPost = () => {
 
   const selectCurrentItems = (currentItems) => {
     window.scrollTo(0, 0);
+
     setCurrentPosts(currentItems);
   };
 
   const handleSearch = () => {
     getPostsByQyery(buildQueryString(), 'byQuery');
+  };
+
+  const imageCachingDisable = (status) => {
+    setImageCachingDisableKey(status);
   };
 
   const filterMobileMenu = (
@@ -530,20 +549,25 @@ const FindPost = () => {
               )}
             </Box>
 
-            {posts && posts.length > 0 ? (
+            {posts ? (
               <Box sx={{ maxWidth: '520px' }}>
                 {currentPosts &&
                   currentPosts.map((post) => (
                     <Box sx={{ m: 2 }}>
-                      <MainCard data={post} />
+                      <MainCard
+                        data={post}
+                        imageCachingDisableKey={imageCachingDisableKey}
+                        imageCachingDisable={imageCachingDisable}
+                      />
                     </Box>
                   ))}
 
                 <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                   <PaginationCustom
                     itemsArray={posts}
-                    itemsPerPage={15}
+                    itemsPerPage={12}
                     selectCurrentItems={selectCurrentItems}
+                    imageCachingDisable={imageCachingDisable}
                   />
                 </Box>
               </Box>

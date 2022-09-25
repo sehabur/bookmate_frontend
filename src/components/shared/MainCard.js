@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Card,
@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 
 import { bdtSign } from '../../data/constants';
 
-const MainCard = ({ data }) => {
+const MainCard = ({ data, imageCachingDisableKey, imageCachingDisable }) => {
   const navigate = useNavigate();
 
   const handleCardClick = (postId) => {
@@ -44,17 +44,19 @@ const MainCard = ({ data }) => {
       >
         <CardMedia
           component="img"
+          key={imageCachingDisableKey && Math.random()}
           sx={{
             width: { xs: 90, sm: 115 },
             height: { xs: 130, sm: 160 },
             my: { sm: 1.5 },
             ml: 1.5,
           }}
-          image={`${process.env.REACT_APP_CLOUD_IMAGE_URL}/${data.image1}`}
+          src={`${process.env.REACT_APP_CLOUD_IMAGE_URL}/${data.image1}`}
           onError={(e) => {
             e.target.onerror = null;
             e.target.src = noImage; // fallback image //
           }}
+          onLoad={() => imageCachingDisable(false)}
           alt="No image available"
         />
 
