@@ -18,6 +18,7 @@ import {
   useTheme,
   useMediaQuery,
   IconButton,
+  Autocomplete,
 } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import MainCard from '../components/shared/MainCard';
@@ -33,6 +34,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import Spinner from '../components/shared/Spinner';
 import PaginationCustom from '../components/shared/PaginationCustom';
+
+import { institution } from '../data/institution';
 
 const sortByOptions = [
   'Date: Newest on top',
@@ -64,9 +67,12 @@ const FindPost = () => {
       exchangeOffer: true,
       sellOffer: true,
     },
+    currentInstitution: null,
     category: 'All',
     search: null,
   });
+
+  const [posts, setPosts] = useState([]);
 
   const [radioValue, setRadioValue] = useState();
 
@@ -80,7 +86,7 @@ const FindPost = () => {
 
   const dispatch = useDispatch();
 
-  const posts = useSelector((state) => state.post);
+  // const posts = useSelector((state) => state.post);
 
   const [currentPosts, setCurrentPosts] = useState(null);
 
@@ -88,15 +94,19 @@ const FindPost = () => {
 
   const auth = useSelector((state) => state.auth);
 
-  const userId = auth ? auth.id : '627bb5ef35ffb019b973d811'; // some random fake id //
+  const userId = auth ? auth.id : 0;
 
   const getPostsByQyery = async (sortingText = '', byQuery = '') => {
     try {
+      console.log(
+        `${process.env.REACT_APP_BACKEND_URL}/api/posts/${byQuery}?type=findpost&user=${userId}&limit=60${sortingText}`
+      );
       setIsLoading(true);
       const response = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/posts/${byQuery}?type=latest&user=${userId}&limit=60${sortingText}`
+        `${process.env.REACT_APP_BACKEND_URL}/api/posts/${byQuery}?type=findpost&user=${userId}&limit=60${sortingText}`
       );
-      dispatch(postActions.loadPosts(response.data.posts));
+      setPosts(response.data.posts);
+      console.log(response.data.posts);
       setIsLoading(false);
     } catch (error) {
       setIsLoading(false);
@@ -107,7 +117,6 @@ const FindPost = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
     getPostsByQyery();
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -138,12 +147,10 @@ const FindPost = () => {
 
   const handleFilterOptionSelect = (e) => {
     setFilterOption({
+      ...filterOption,
       location: {
         [e.target.name]: e.target.value,
       },
-      offerType: { ...filterOption.offerType },
-      sortBy: filterOption.sortBy,
-      search: filterOption.search,
     });
   };
 
@@ -154,15 +161,20 @@ const FindPost = () => {
     });
   };
 
+  const handleInstitutionOptionSelect = (e) => {
+    setFilterOption({
+      ...filterOption,
+      currentInstitution: e.target.textContent,
+    });
+  };
+
   const handleFilterOptionChecked = (e) => {
     setFilterOption({
-      location: { ...filterOption.location },
+      ...filterOption,
       offerType: {
         ...filterOption.offerType,
         [e.target.name]: e.target.checked,
       },
-      sortBy: filterOption.sortBy,
-      search: filterOption.search,
     });
   };
 
@@ -173,8 +185,8 @@ const FindPost = () => {
       ...filterOption.location,
       ...filterOption.offerType,
       search: filterOption.search,
-      category:
-        filterOption.category && filterOption.category.replace('&', 'AND'),
+      category: filterOption?.category?.replace('&', 'AND'),
+      currentInstitution: filterOption?.currentInstitution?.replace('&', 'AND'),
     };
     let queryText = '';
     for (let key in reqBody) {
@@ -194,8 +206,6 @@ const FindPost = () => {
     setSortedOption(e.target.value);
 
     const sortedOptionIndex = sortByOptions.indexOf(e.target.value);
-
-    console.log(sortedOptionIndex);
 
     let text;
     switch (sortedOptionIndex) {
@@ -268,7 +278,7 @@ const FindPost = () => {
         fullWidth
         value={filterOption.category}
         onChange={handleCategoryOptionSelect}
-        name="sortBy"
+        name="category"
         size="small"
         sx={{ mt: 1, mb: 4 }}
       >
@@ -279,6 +289,25 @@ const FindPost = () => {
           </MenuItem>
         ))}
       </TextField>
+
+      <FormLabel>Filter results by Institution</FormLabel>
+      <Autocomplete
+        disablePortal
+        freeSolo
+        options={institution}
+        renderInput={(params) => (
+          <TextField
+            name="currentInstitution"
+            {...params}
+            size="small"
+            sx={{ mt: 1, mb: 4 }}
+          />
+        )}
+        value={filterOption.currentInstitution}
+        onChange={(e) => {
+          handleInstitutionOptionSelect(e);
+        }}
+      />
 
       <FormControl>
         <FormLabel id="location" name="location">
@@ -484,16 +513,6 @@ const FindPost = () => {
         </Grid>
         <Grid item xs={12} sm={8}>
           <Box>
-            {/* GPS options. will work later */}
-            {/* <Stack direction="row" alignItems="center" sx={{ px: 2 }}>
-              <Typography>
-                Enable location and then press 'Locate Me' to set your precise
-                location
-              </Typography>
-              <Button variant="contained" sx={{ ml: 2 }}>
-                <Typography>Locate Me!</Typography>
-              </Button>
-            </Stack> */}
             <Box
               sx={{
                 display: 'flex',

@@ -102,14 +102,14 @@ const MyPostsCard = ({ data }) => {
                 <>
                   <CheckCircleOutlineIcon color="success" />
                   <Typography sx={{ ml: 1, fontSize: '.9rem' }}>
-                    Exchange done
+                    Exchange/sell done
                   </Typography>
                 </>
               ) : (
                 <>
                   <ErrorOutlineIcon color="warning" />{' '}
                   <Typography sx={{ ml: 1, fontSize: '.9rem' }}>
-                    Exchange not done yet
+                    Exchange/sell not done yet
                   </Typography>
                 </>
               )}

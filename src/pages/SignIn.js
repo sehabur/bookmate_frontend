@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import {
+  Link as RouterLink,
+  useNavigate,
+  useSearchParams,
+} from 'react-router-dom';
 
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
@@ -20,8 +24,12 @@ import axios from 'axios';
 
 // import ToastMessage from '../components/shared/ToastMessage';
 
-const SignIn = ({ redirect }) => {
-  const redirection = redirect ? redirect : '/';
+const SignIn = () => {
+  let [searchParams, setSearchParams] = useSearchParams();
+
+  const redirect = searchParams.get('redirect');
+
+  const redirection = redirect ? `/${redirect}` : '/';
 
   const [isLoading, setIsLoading] = useState(false);
 

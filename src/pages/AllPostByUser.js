@@ -4,19 +4,13 @@ import {
   Button,
   ClickAwayListener,
   Grid,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
   Paper,
   Tooltip,
   Typography,
 } from '@mui/material';
 import Spinner from '../components/shared/Spinner';
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams, Link as RouterLink } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import MainCard from '../components/shared/MainCard';
 import CallIcon from '@mui/icons-material/Call';

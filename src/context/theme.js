@@ -2,6 +2,9 @@ import { createTheme } from '@mui/material';
 import { grey } from '@mui/material/colors';
 
 const theme = createTheme({
+  typography: {
+    fontFamily: ['Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'].join(','),
+  },
   palette: {
     // buttonWhite: {
     //   main: '#FFffff',

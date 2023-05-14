@@ -14,6 +14,8 @@ import {
   Popover,
   Badge,
   Chip,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
@@ -24,7 +26,6 @@ import InputBase from '@mui/material/InputBase';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import { styled, alpha } from '@mui/material/styles';
-import { blueGrey } from '@mui/material/colors';
 
 import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
@@ -42,7 +43,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { authActions, notificationActions } from '../../store';
 import ToastMessage from './ToastMessage';
 
-import { yellow, blue } from '@mui/material/colors';
+import { yellow, blue, grey } from '@mui/material/colors';
 import axios from 'axios';
 import Spinner from './Spinner';
 import ReactTimeAgo from 'react-time-ago';
@@ -51,9 +52,10 @@ import OrderAcceptDialog, { callOrderAcceptApi } from './OrderAcceptDialog';
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
   borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  border: `2px solid ${grey[400]}`,
+  backgroundColor: theme.palette.common.white,
   '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
+    backgroundColor: alpha(theme.palette.common.black, 0.03),
   },
   marginRight: theme.spacing(2),
   marginLeft: 0,
@@ -72,6 +74,7 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
+  color: yellow[800],
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -116,6 +119,10 @@ const Header = () => {
   const [acceptedOrderNotif, setAcceptedOrderNotif] = useState(null);
 
   const [newMessageCount, setNewMessageCount] = useState(0);
+
+  const theme = useTheme();
+
+  const matchesSmDown = useMediaQuery(theme.breakpoints.down('sm'));
 
   const navigate = useNavigate();
 
@@ -278,7 +285,7 @@ const Header = () => {
       anchorEl={profileMenuAnchorEl}
       anchorOrigin={{
         vertical: 'bottom',
-        horizontal: 'right',
+        horizontal: 'left',
       }}
       id="profile-menu"
       keepMounted
@@ -395,18 +402,19 @@ const Header = () => {
                   <Typography sx={{ fontSize: '1rem' }}>
                     Notifications
                   </Typography>
-                  {notificationItemsList && notificationItemsList.length > 0 && (
-                    <Chip
-                      label={notificationItemsList.length}
-                      color="error"
-                      size="small"
-                      sx={{
-                        fontSize: '.8rem',
-                        borderRadius: '50%',
-                        ml: 2,
-                      }}
-                    />
-                  )}
+                  {notificationItemsList &&
+                    notificationItemsList.length > 0 && (
+                      <Chip
+                        label={notificationItemsList.length}
+                        color="error"
+                        size="small"
+                        sx={{
+                          fontSize: '.8rem',
+                          borderRadius: '50%',
+                          ml: 2,
+                        }}
+                      />
+                    )}
                 </Box>
               }
             />
@@ -564,33 +572,42 @@ const Header = () => {
     <Box sx={{ flexGrow: 1 }}>
       <AppBar
         position="fixed"
-        sx={{ bgcolor: blueGrey[900], py: { xs: 0.7, sm: 0 } }}
+        sx={{
+          bgcolor: 'white',
+          py: { xs: 0.7, sm: 0 },
+          borderBottom: `1px solid ${grey[400]}`,
+        }}
+        elevation={0}
       >
-        <Toolbar>
+        <Toolbar sx={{ display: 'flex', justifyContent: 'center' }}>
           {drawerContent}
 
           <Box
             component={RouterLink}
             to="/"
-            sx={{ pt: 1, mx: 5, display: { xs: 'none', sm: 'block' } }}
+            sx={{
+              pt: 1,
+              ml: { xs: 0, sm: 5 },
+              mr: { xs: 1, sm: 5 },
+              display: { xs: 'block', sm: 'block' },
+            }}
           >
             <img
               src="book-exchange-logo.png"
               alt="logo"
-              width="70"
-              height="70"
+              width={matchesSmDown ? '40' : '70'}
+              height={matchesSmDown ? '40' : '70'}
             />
           </Box>
 
           <IconButton
             size="large"
             edge="start"
-            color="inherit"
             aria-label="open drawer"
-            sx={{ mr: { xs: 1, sm: 3 } }}
+            sx={{ mr: { xs: 0, sm: 3 } }}
             onClick={handleDrawerOpen}
           >
-            <MenuIcon />
+            <MenuIcon color="primary" />
           </IconButton>
 
           <Search>
@@ -601,34 +618,24 @@ const Header = () => {
               placeholder="Search title or writer"
               inputProps={{ 'aria-label': 'search' }}
               onChange={handleSearch}
+              sx={{ color: 'black' }}
             />
           </Search>
-          <Box sx={{ flexGrow: 1 }} />
+          {/* <Box sx={{ flexGrow: 1 }} /> */}
           <Box sx={{ display: { xs: 'none', sm: 'flex' } }}>
             <Button
               variant="text"
-              startIcon={<ContentPasteSearchIcon sx={{ color: yellow[600] }} />}
-              sx={{ mx: 1.5, color: blueGrey[50] }}
+              sx={{ mr: 1.5, ml: 3 }}
               component={RouterLink}
-              to="/findPost"
+              to="/howitworks"
             >
-              Find Books
-            </Button>
-            <Button
-              variant="text"
-              color="inherit"
-              startIcon={<CreateIcon sx={{ color: yellow[600] }} />}
-              sx={{ mx: 1.5, color: blueGrey[50] }}
-              component={RouterLink}
-              to="/createPost"
-            >
-              Create Post
+              HOW IT WORKS
             </Button>
             {userLoggedIn && (
               <>
                 <IconButton
                   aria-label="messages"
-                  sx={{ color: blueGrey[50], mx: 1 }}
+                  sx={{ color: 'primary.main', mx: 1 }}
                   component={RouterLink}
                   to="/messages"
                 >
@@ -639,7 +646,7 @@ const Header = () => {
 
                 <IconButton
                   aria-label="notification"
-                  sx={{ color: blueGrey[50], mx: 1 }}
+                  sx={{ color: 'primary.main', mx: 1 }}
                   onClick={handleOpenNotificationMenu}
                 >
                   <Badge
@@ -661,8 +668,8 @@ const Header = () => {
                 sx={{
                   width: 36,
                   height: 36,
-                  ml: 2,
-                  mr: 2,
+                  ml: { xs: 0, sm: 2 },
+                  mr: { xs: 0, sm: 2 },
                   bgcolor: blue[700],
                   color: yellow[600],
                 }}
@@ -673,12 +680,16 @@ const Header = () => {
               />
             ) : (
               <Button
-                variant="outlined"
-                sx={{ mx: 1.5, px: 2, borderRadius: 1, color: yellow[600] }}
+                variant={matchesSmDown ? 'contained' : 'outlined'}
+                sx={{
+                  mx: { xs: 0, sm: 1.5 },
+                  px: { xs: 1, sm: 2 },
+                  borderRadius: 1,
+                }}
                 component={RouterLink}
                 to="/signin"
               >
-                Login
+                Sign in
               </Button>
             )}
           </Box>
@@ -819,42 +830,43 @@ const Header = () => {
                         timeStyle="round-minute"
                       />
                     </Typography>
-                    {notification.type === 'reqSent' && notification.isActive && (
-                      <Box sx={{ my: 1 }}>
-                        <Button
-                          variant="outlined"
-                          size="small"
-                          color="info"
-                          sx={{ mr: 1.5 }}
-                          component={RouterLink}
-                          to={`/allPost/user/${notification.sender}`}
-                        >
-                          Explore Books
-                        </Button>
-                        <Button
-                          variant="contained"
-                          size="small"
-                          color="success"
-                          sx={{ mr: 1.5 }}
-                          onClick={() =>
-                            handleAcceptRequest('accepted', notification)
-                          }
-                        >
-                          Accept
-                        </Button>
-                        <Button
-                          variant="contained"
-                          size="small"
-                          color="error"
-                          sx={{ mr: 1.5 }}
-                          onClick={() =>
-                            handleAcceptRequest('rejected', notification)
-                          }
-                        >
-                          Reject
-                        </Button>
-                      </Box>
-                    )}
+                    {notification.type === 'reqSent' &&
+                      notification.isActive && (
+                        <Box sx={{ my: 1 }}>
+                          <Button
+                            variant="outlined"
+                            size="small"
+                            color="info"
+                            sx={{ mr: 1.5 }}
+                            component={RouterLink}
+                            to={`/allPost/user/${notification.sender}`}
+                          >
+                            Explore Books
+                          </Button>
+                          <Button
+                            variant="contained"
+                            size="small"
+                            color="success"
+                            sx={{ mr: 1.5 }}
+                            onClick={() =>
+                              handleAcceptRequest('accepted', notification)
+                            }
+                          >
+                            Accept
+                          </Button>
+                          <Button
+                            variant="contained"
+                            size="small"
+                            color="error"
+                            sx={{ mr: 1.5 }}
+                            onClick={() =>
+                              handleAcceptRequest('rejected', notification)
+                            }
+                          >
+                            Reject
+                          </Button>
+                        </Box>
+                      )}
                     {/* {notification.type === 'reqAck' && (
                       <Box sx={{ my: 1 }}>
                         <Button

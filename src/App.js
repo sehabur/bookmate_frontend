@@ -24,6 +24,10 @@ import Notification from './pages/Notification';
 import ExploreShops from './pages/ExploreShops';
 import Messages from './pages/Messages';
 import ManagePassword from './pages/ManagePassword';
+import HowItWorks from './pages/HowItWorks';
+import ExploreNearestBooks from './pages/ExploreNearestBooks';
+import BooksFromInstitute from './pages/BooksFromInstitute';
+import BooksFromArea from './pages/BooksFromArea';
 
 const App = () => {
   const [isMessagePage, setIsMessagePage] = useState(false);
@@ -36,19 +40,20 @@ const App = () => {
     <Provider store={store}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Container component="main" maxWidth={false} disableGutters>
-          <Box
-            sx={{
-              maxWidth: '1024px',
-              mx: 'auto',
-              mt: { xs: 2.5, sm: 5 },
-              mb: { xs: 2.5, sm: 0 },
-            }}
-          >
-            <BrowserRouter>
+        <BrowserRouter>
+          <Container component="main" maxWidth={false} disableGutters>
+            <Box
+              sx={{
+                maxWidth: '1024px',
+                mx: 'auto',
+                mt: { xs: 2.5, sm: 5 },
+                mb: { xs: 2.5, sm: 0 },
+              }}
+            >
               <Header />
               <Routes>
                 <Route path="/" element={<Homepage />} />
+                <Route path="/howitworks" element={<HowItWorks />} />
                 <Route path="/post/:id" element={<PostDetails />} />
                 <Route path="/allPost/user/:id" element={<AllPostByUser />} />
                 <Route path="/findPost" element={<FindPost />} />
@@ -57,6 +62,15 @@ const App = () => {
                 <Route path="/myAccount" element={<MyAccount />} />
                 <Route path="/notification" element={<Notification />} />
                 <Route path="/exploreShops" element={<ExploreShops />} />
+                <Route
+                  path="/exploreNearestBooks"
+                  element={<ExploreNearestBooks />}
+                />
+                <Route
+                  path="/booksFromInstitute"
+                  element={<BooksFromInstitute />}
+                />
+                <Route path="/booksFromArea" element={<BooksFromArea />} />
                 <Route
                   path="/messages"
                   element={<Messages callback={messagePageCallback} />}
@@ -72,11 +86,11 @@ const App = () => {
                 <Route path="*" element={<NotFound />} />
               </Routes>
               <BottomNav />
-            </BrowserRouter>
-          </Box>
-          {!isMessagePage && <Footer />}
-          <BottomNavCompansator />
-        </Container>
+            </Box>
+            {!isMessagePage && <Footer />}
+            <BottomNavCompansator />
+          </Container>
+        </BrowserRouter>
       </ThemeProvider>
     </Provider>
   );

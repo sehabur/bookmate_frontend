@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-
 import {
   Button,
   Typography,
@@ -16,7 +15,7 @@ import KeyboardArrowRightIcon from '@mui/icons-material/KeyboardArrowRight';
 import MainCard from '../shared/MainCard';
 import { blue, yellow } from '@mui/material/colors';
 
-const NearestBooks = ({ isLoggedIn, postsToShow = 6 }) => {
+const InstituteBooks = ({ isLoggedIn, postsToShow = 6 }) => {
   const theme = useTheme();
 
   const matchesSmDown = useMediaQuery(theme.breakpoints.down('sm'));
@@ -25,11 +24,11 @@ const NearestBooks = ({ isLoggedIn, postsToShow = 6 }) => {
 
   return (
     <Box>
-      {posts?.nearestPosts && posts?.nearestPosts.length > 0 ? (
+      {posts?.institutionPosts && posts?.institutionPosts.length > 0 ? (
         <>
           <Box sx={{ ml: 2 }}>
             <Grid container>
-              {posts.nearestPosts.slice(0, postsToShow).map((post) => (
+              {posts.institutionPosts.slice(0, postsToShow).map((post) => (
                 <Grid Item xs={12} sm={6}>
                   <Box sx={{ mr: 2, mb: 2 }}>
                     <MainCard data={post} />
@@ -45,9 +44,9 @@ const NearestBooks = ({ isLoggedIn, postsToShow = 6 }) => {
               fullWidth={matchesSmDown}
               endIcon={<KeyboardArrowRightIcon />}
               component={RouterLink}
-              to="/booksFromArea"
+              to="/booksFromInstitute"
             >
-              Explore more books near you
+              Explore more books at your institution
             </Button>
           </Box>
         </>
@@ -56,7 +55,7 @@ const NearestBooks = ({ isLoggedIn, postsToShow = 6 }) => {
           <ErrorOutlineIcon sx={{ color: yellow[700], fontSize: '2.5rem' }} />
           {isLoggedIn ? (
             <Typography sx={{ color: 'gray', fontSize: '1rem' }}>
-              No books found in your area. You can search more books{' '}
+              No books found at your institution. You can search more books{' '}
               <RouterLink to="/findPost">here</RouterLink>
             </Typography>
           ) : (
@@ -69,7 +68,7 @@ const NearestBooks = ({ isLoggedIn, postsToShow = 6 }) => {
               >
                 sign in
               </Typography>{' '}
-              and set your "Area" to see your nearest books
+              and set your "Institution" to see books at your institution
             </Typography>
           )}
         </Box>
@@ -78,4 +77,4 @@ const NearestBooks = ({ isLoggedIn, postsToShow = 6 }) => {
   );
 };
 
-export default NearestBooks;
+export default InstituteBooks;

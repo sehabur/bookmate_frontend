@@ -35,8 +35,8 @@ const OrderAcceptDialog = ({ dialogOpen, handleDialogClose }) => {
     <ConfirmationDialog
       dialogOpen={dialogOpen}
       dialogOnClose={handleDialogClose}
-      dialogTitle="Your post is being deactivated"
-      dialogText="As you have accepted buy/exchange request for this post, your post will be automatically deactivated. If you want to activate it again, please do it manually from My Posts section."
+      dialogTitle="Your post will be deactivated"
+      dialogText="If you accept buy/exchange request for this book, your post will be automatically deactivated. To activate it again, please do it manually from 'My Posts' section."
     />
   );
 };

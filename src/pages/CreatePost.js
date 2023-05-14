@@ -14,16 +14,20 @@ import {
   Grid,
   Button,
   Alert,
+  Autocomplete,
+  Radio,
+  RadioGroup,
 } from '@mui/material';
-import imageCompression from 'browser-image-compression';
 
 import CloseIcon from '@mui/icons-material/Close';
 
 import Spinner from '../components/shared/Spinner';
 
-import { districtMapping } from '../data/districtMap';
+import { dhakaCityArea, districtMapping } from '../data/districtMap';
 import { categories } from '../data/bookCategory';
 import { authActions } from '../store';
+import { compressImageFile } from '../helper';
+import { institution } from '../data/institution';
 
 const previewUrlDefaultSet = {
   previewUrl1: null,
@@ -38,7 +42,7 @@ const CreatePost = () => {
 
   const formDefaultState = {
     category: '',
-    writer: '',
+    writer: null,
     title: '',
     description: '',
     image1: null,
@@ -47,8 +51,7 @@ const CreatePost = () => {
     division: auth ? auth.division : '',
     district: auth ? auth.district : '',
     area: auth ? auth.area : '',
-    lat: null,
-    long: null,
+    currentInstitution: auth ? auth.currentInstitution : '',
     enableExchangeOffer: true,
     enableSellOffer: true,
     offerType: 'both',
@@ -66,6 +69,9 @@ const CreatePost = () => {
 
   const [previewUrl, setPreviewUrl] = useState(previewUrlDefaultSet);
 
+  const [locationRadioButtonValue, setLocationRadioButtonValue] =
+    useState(null);
+
   const navigate = useNavigate();
 
   const userLoggedIn = auth && auth.isLoggedIn;
@@ -75,6 +81,16 @@ const CreatePost = () => {
       navigate('/signin?redirect=createPost');
     }
   }, [navigate, userLoggedIn]);
+
+  useEffect(() => {
+    if (auth) {
+      if (auth?.division === 'Dhaka' && auth?.district === 'Dhaka') {
+        setLocationRadioButtonValue('insideDhaka');
+      } else {
+        setLocationRadioButtonValue('outsideDhaka');
+      }
+    }
+  }, [auth]);
 
   useEffect(() => {
     if (!(formInputs.image1 || formInputs.image2 || formInputs.image3)) {
@@ -118,11 +134,8 @@ const CreatePost = () => {
   const handleImagePick = async (e, newFile) => {
     if (e.target.files) {
       const imageFile = e.target.files[0];
-      const compressedFile = await imageCompression(imageFile, {
-        maxSizeMB: 0.08,
-        maxWidthOrHeight: 560,
-        useWebWorker: true,
-      });
+
+      const compressedFile = await compressImageFile(imageFile, 0.08);
 
       setFormInputs({
         ...formInputs,
@@ -163,6 +176,32 @@ const CreatePost = () => {
         enableExchangeOffer: true,
       });
     }
+  };
+
+  const handleRadioChange = ({ target: { value: targetValue } }) => {
+    setLocationRadioButtonValue(targetValue);
+    if (targetValue === 'insideDhaka') {
+      setFormInputs({
+        ...formInputs,
+        division: 'Dhaka',
+        district: 'Dhaka',
+        area: '',
+      });
+    } else if (targetValue === 'outsideDhaka') {
+      setFormInputs({
+        ...formInputs,
+        division: '',
+        district: '',
+        area: '',
+      });
+    }
+  };
+
+  const handleAutoCompleteChange = (event, targetName) => {
+    setFormInputs({
+      ...formInputs,
+      [targetName]: event.target.textContent,
+    });
   };
 
   // const handleCheckboxChange = (e) => {
@@ -266,11 +305,23 @@ const CreatePost = () => {
 
         <Grid
           container
-          justifyContent="flex-start"
+          justifyContent="space-between"
           spacing={3}
           component="form"
           onSubmit={handlePostSubmit}
         >
+          <Grid item xs={12}>
+            <Typography
+              sx={{
+                mt: 2,
+                fontSize: '1.1rem',
+                color: 'primary.main',
+              }}
+            >
+              Book Details
+            </Typography>
+          </Grid>
+
           <Grid item xs={12} sm={6}>
             <TextField
               select
@@ -294,9 +345,8 @@ const CreatePost = () => {
               label="Writer"
               name="writer"
               fullWidth
-              value={formInputs.writer}
+              // value={formInputs.writer}
               onChange={handleChange}
-              sx={{ width: '100%' }}
               required
             />
           </Grid>
@@ -328,7 +378,7 @@ const CreatePost = () => {
               label="Title"
               name="title"
               fullWidth
-              value={formInputs.title}
+              // value={formInputs.title}
               onChange={handleChange}
               sx={{ width: '100%' }}
               required
@@ -342,7 +392,7 @@ const CreatePost = () => {
               name="description"
               rows={3}
               fullWidth
-              value={formInputs.description}
+              // value={formInputs.description}
               onChange={handleChange}
               size="small"
               sx={{ width: '100%' }}
@@ -381,6 +431,18 @@ const CreatePost = () => {
               onChange={handleChange}
               sx={{ width: '100%' }}
             />
+          </Grid>
+
+          <Grid item xs={12}>
+            <Typography
+              sx={{
+                mt: 2,
+                fontSize: '1.1rem',
+                color: 'primary.main',
+              }}
+            >
+              Book Images
+            </Typography>
           </Grid>
 
           <Grid item xs={12} sm={4}>
@@ -496,61 +558,136 @@ const CreatePost = () => {
             )}
           </Grid>
 
-          <Grid item xs={12} sm={4}>
-            <TextField
-              select
-              label="Division"
-              name="division"
-              fullWidth
-              value={formInputs.division}
-              onChange={handleChange}
-              sx={{ width: '100%' }}
-              size="small"
-              required
+          <Grid item xs={12}>
+            <Typography
+              sx={{
+                mt: 2,
+                fontSize: '1.1rem',
+                color: 'primary.main',
+              }}
             >
-              {districtMapping.map((option) => (
-                <MenuItem key={option.id} value={option.division}>
-                  {option.division}
-                </MenuItem>
-              ))}
-            </TextField>
+              Location Details
+            </Typography>
           </Grid>
 
-          <Grid item xs={12} sm={4}>
-            <TextField
-              select
-              label="District"
-              name="district"
-              fullWidth
-              value={formInputs.district}
-              onChange={handleChange}
-              size="small"
-              required
-            >
-              {districtMapping.map((option) => {
-                if (option.division === formInputs.division) {
-                  return option.district.map((item) => (
-                    <MenuItem key={item} value={item}>
-                      {item}
-                    </MenuItem>
-                  ));
-                }
-              })}
-            </TextField>
-          </Grid>
-
-          <Grid item xs={12} sm={4}>
-            <TextField
-              label="Area"
-              name="area"
-              fullWidth
-              value={formInputs.area}
-              onChange={handleChange}
-              sx={{ width: '100%' }}
-              size="small"
-              required
+          <Grid item xs={12}>
+            <Autocomplete
+              disablePortal
+              freeSolo
+              options={institution}
+              renderInput={(params) => (
+                <TextField
+                  name="currentInstitution"
+                  required
+                  {...params}
+                  label="Current Institution"
+                  helperText="Current school/college/university/office name"
+                  onChange={handleChange}
+                />
+              )}
+              value={formInputs.currentInstitution}
+              onChange={(e) => {
+                handleAutoCompleteChange(e, 'currentInstitution');
+              }}
             />
           </Grid>
+
+          <Grid item xs={12}>
+            <RadioGroup
+              name="location-radio"
+              value={locationRadioButtonValue}
+              onChange={handleRadioChange}
+              sx={{ display: 'block' }}
+            >
+              <FormControlLabel
+                value="insideDhaka"
+                control={<Radio />}
+                label="Inside Dhaka City"
+              />
+
+              <FormControlLabel
+                value="outsideDhaka"
+                control={<Radio />}
+                label="Outside Dhaka City"
+              />
+            </RadioGroup>
+          </Grid>
+
+          {locationRadioButtonValue === 'insideDhaka' ? (
+            <Grid item xs={12} sm={6}>
+              <Autocomplete
+                id="area"
+                freeSolo
+                options={dhakaCityArea}
+                renderInput={(params) => (
+                  <TextField
+                    name="area"
+                    required
+                    {...params}
+                    label="Area"
+                    onChange={handleChange}
+                  />
+                )}
+                value={formInputs.area}
+                onChange={(e) => {
+                  handleAutoCompleteChange(e, 'area');
+                }}
+              />
+            </Grid>
+          ) : (
+            <>
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  select
+                  label="Division"
+                  name="division"
+                  fullWidth
+                  value={formInputs.division}
+                  onChange={handleChange}
+                  required
+                >
+                  {districtMapping.map((option) => (
+                    <MenuItem key={option.id} value={option.division}>
+                      {option.division}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  select
+                  label="District"
+                  name="district"
+                  fullWidth
+                  value={formInputs.district}
+                  onChange={handleChange}
+                  required
+                >
+                  {districtMapping.map((option) => {
+                    if (option.division === formInputs.division) {
+                      return option.district.map((item) => (
+                        <MenuItem key={item} value={item}>
+                          {item}
+                        </MenuItem>
+                      ));
+                    }
+                  })}
+                </TextField>
+              </Grid>
+
+              <Grid item xs={12} sm={4}>
+                <TextField
+                  label="Area"
+                  name="area"
+                  fullWidth
+                  value={formInputs.area}
+                  onChange={handleChange}
+                  required
+                />
+              </Grid>
+            </>
+          )}
 
           <Grid item xs={12}>
             <FormGroup>

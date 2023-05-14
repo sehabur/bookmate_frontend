@@ -7,6 +7,10 @@ import {
   Alert,
   Divider,
   MenuItem,
+  Autocomplete,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
 } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
@@ -15,8 +19,9 @@ import { Link as RouterLink } from 'react-router-dom';
 import { authActions } from '../../store';
 
 import Spinner from '../shared/Spinner';
-import { districtMapping } from '../../data/districtMap';
-import imageCompression from 'browser-image-compression';
+import { dhakaCityArea, districtMapping } from '../../data/districtMap';
+import { institution } from '../../data/institution';
+import { compressImageFile } from '../../helper';
 
 const formDefaultState = {
   shopName: '',
@@ -28,12 +33,13 @@ const formDefaultState = {
   division: '',
   district: '',
   area: '',
+  currentInstitution: '',
 };
 
 const ManageAccount = () => {
   const dispatch = useDispatch();
 
-  const [formInputs, setformInputs] = useState(formDefaultState);
+  const [formInputs, setFormInputs] = useState(formDefaultState);
 
   const [isLoading, setIsLoading] = useState(false);
 
@@ -44,6 +50,10 @@ const ManageAccount = () => {
   const [imageUrl, setImageUrl] = useState(null);
 
   const [previewUrl, setPreviewUrl] = useState(null);
+
+  const [locationRadioButtonValue, setLocationRadioButtonValue] =
+    useState(null);
+
   // const [previewUrl, setPreviewUrl] = useState(
   //   formInputs
   //     ? `${process.env.REACT_APP_BACKEND_URL}/images/${formInputs.image}`
@@ -64,40 +74,6 @@ const ManageAccount = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [auth]);
 
-  const getUserDetails = async () => {
-    try {
-      console.log(process.env);
-      setIsLoading(true);
-      const userRespose = await axios.get(
-        `${process.env.REACT_APP_BACKEND_URL}/api/users/profile/${
-          auth && auth.id
-        }`,
-        config
-      );
-      setformInputs({
-        ...formInputs,
-        shopName: userRespose.data.user.shopName,
-        firstName: userRespose.data.user.firstName || '',
-        lastName: userRespose.data.user.lastName || '',
-        email: userRespose.data.user.email,
-        phoneNo: userRespose.data.user.phoneNo || '',
-        image: userRespose.data.user.image || null,
-        division: userRespose.data.user.division || '',
-        district: userRespose.data.user.district || '',
-        area: userRespose.data.user.area || '',
-      });
-      if (userRespose.data.user.image) {
-        setImageUrl(
-          `${process.env.REACT_APP_CLOUD_IMAGE_URL}/${userRespose.data.user.image}`
-        );
-      }
-      setIsLoading(false);
-    } catch (error) {
-      setIsLoading(false);
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
     if (formInputs.image && typeof formInputs.image !== 'string') {
       var reader = new FileReader();
@@ -108,15 +84,63 @@ const ManageAccount = () => {
     }
   }, [formInputs.image]);
 
+  const getUserDetails = async () => {
+    try {
+      console.log(process.env);
+      setIsLoading(true);
+      const userRespose = await axios.get(
+        `${process.env.REACT_APP_BACKEND_URL}/api/users/profile/${
+          auth && auth.id
+        }`,
+        config
+      );
+      const {
+        shopName,
+        firstName,
+        lastName,
+        email,
+        phoneNo,
+        image,
+        division,
+        district,
+        area,
+        currentInstitution,
+      } = userRespose.data.user;
+
+      if (division === 'Dhaka' && district === 'Dhaka') {
+        setLocationRadioButtonValue('insideDhaka');
+      } else {
+        setLocationRadioButtonValue('outsideDhaka');
+      }
+
+      setFormInputs({
+        ...formInputs,
+        shopName,
+        firstName: firstName || '',
+        lastName: lastName || '',
+        email,
+        phoneNo: phoneNo || '',
+        image: image || null,
+        division: division || '',
+        district: district || '',
+        area: area || '',
+        currentInstitution: currentInstitution || '',
+      });
+      if (image) {
+        setImageUrl(`${process.env.REACT_APP_CLOUD_IMAGE_URL}/${image}`);
+      }
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+      console.log(error);
+    }
+  };
+
   const handleImagePick = async (e) => {
     if (e.target.files) {
       const imageFile = e.target.files[0];
-      const compressedFile = await imageCompression(imageFile, {
-        maxSizeMB: 0.4,
-        maxWidthOrHeight: 720,
-        useWebWorker: true,
-      });
-      setformInputs({
+      const compressedFile = await compressImageFile(imageFile, 0.08);
+      setFormInputs({
         ...formInputs,
         image: compressedFile,
       });
@@ -125,7 +149,7 @@ const ManageAccount = () => {
   };
 
   const handleRemoveImage = () => {
-    setformInputs({
+    setFormInputs({
       ...formInputs,
       image: null,
     });
@@ -134,9 +158,35 @@ const ManageAccount = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setformInputs({
+    setFormInputs({
       ...formInputs,
       [name]: value,
+    });
+  };
+
+  const handleRadioChange = ({ target: { value: targetValue } }) => {
+    setLocationRadioButtonValue(targetValue);
+    if (targetValue === 'insideDhaka') {
+      setFormInputs({
+        ...formInputs,
+        division: 'Dhaka',
+        district: 'Dhaka',
+        area: '',
+      });
+    } else if (targetValue === 'outsideDhaka') {
+      setFormInputs({
+        ...formInputs,
+        division: '',
+        district: '',
+        area: '',
+      });
+    }
+  };
+
+  const handleAutoCompleteChange = (event, targetName) => {
+    setFormInputs({
+      ...formInputs,
+      [targetName]: event.target.textContent,
     });
   };
 
@@ -165,6 +215,7 @@ const ManageAccount = () => {
             area: formInputs.area,
           })
         );
+        setPreviewUrl(null);
       }
     } catch (error) {
       setSuccess(false);
@@ -182,6 +233,8 @@ const ManageAccount = () => {
       console.log(error);
     }
   };
+
+  console.log(formInputs);
 
   const errorAndSuccessAlert = (
     <Box sx={{ mb: 2 }}>
@@ -207,21 +260,54 @@ const ManageAccount = () => {
 
       <Grid
         container
-        justifyContent="center"
+        justifyContent="space-between"
         spacing={3}
         component="form"
         onSubmit={handleSubmit}
         sx={{ mb: 2 }}
       >
-        <Grid item xs={12} sm={12}>
+        <Grid item xs={12}>
+          <Typography
+            sx={{
+              fontSize: '1.1rem',
+              color: 'primary.main',
+            }}
+          >
+            Basic Information
+          </Typography>
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
           <TextField
-            label="Shop Name"
+            label="Username"
             name="shopName"
             fullWidth
             required
             value={formInputs.shopName}
             onChange={handleChange}
           ></TextField>
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <Autocomplete
+            disablePortal
+            freeSolo
+            options={institution}
+            renderInput={(params) => (
+              <TextField
+                name="currentInstitution"
+                required
+                {...params}
+                label="Current Institution"
+                helperText="Current school/college/university/office name"
+                onChange={handleChange}
+              />
+            )}
+            value={formInputs.currentInstitution}
+            onChange={(e) => {
+              handleAutoCompleteChange(e, 'currentInstitution');
+            }}
+          />
         </Grid>
 
         <Grid item xs={12} sm={6}>
@@ -240,6 +326,7 @@ const ManageAccount = () => {
             name="phoneNo"
             type="number"
             fullWidth
+            required
             value={formInputs.phoneNo}
             onChange={handleChange}
           ></TextField>
@@ -264,66 +351,128 @@ const ManageAccount = () => {
           ></TextField>
         </Grid>
 
-        <Grid item xs={12} sm={4}>
-          <TextField
-            select
-            label="Division"
-            name="division"
-            fullWidth
-            value={formInputs.division}
-            onChange={handleChange}
-            sx={{ width: '100%' }}
-            size="small"
-            required
+        <Grid item xs={12}>
+          <Typography
+            sx={{
+              mt: 3,
+              fontSize: '1.1rem',
+              color: 'primary.main',
+            }}
           >
-            {districtMapping.map((option) => (
-              <MenuItem key={option.id} value={option.division}>
-                {option.division}
-              </MenuItem>
-            ))}
-          </TextField>
+            Location Details
+          </Typography>
         </Grid>
 
-        <Grid item xs={12} sm={4}>
-          <TextField
-            select
-            label="District"
-            name="district"
-            fullWidth
-            value={formInputs.district}
-            onChange={handleChange}
-            size="small"
-            required
+        <Grid item xs={12}>
+          <RadioGroup
+            name="location-radio"
+            value={locationRadioButtonValue}
+            onChange={handleRadioChange}
+            sx={{ display: 'block' }}
           >
-            {districtMapping.map((option) => {
-              if (option.division === formInputs.division) {
-                return option.district.map((item) => (
-                  <MenuItem key={item} value={item}>
-                    {item}
+            <FormControlLabel
+              value="insideDhaka"
+              control={<Radio />}
+              label="Inside Dhaka City"
+            />
+
+            <FormControlLabel
+              value="outsideDhaka"
+              control={<Radio />}
+              label="Outside Dhaka City"
+            />
+          </RadioGroup>
+        </Grid>
+
+        {locationRadioButtonValue === 'insideDhaka' ? (
+          <Grid item xs={12} sm={6}>
+            <Autocomplete
+              id="area"
+              freeSolo
+              options={dhakaCityArea}
+              renderInput={(params) => (
+                <TextField
+                  name="area"
+                  required
+                  {...params}
+                  label="Area"
+                  onChange={handleChange}
+                />
+              )}
+              value={formInputs.area}
+              onChange={(e) => {
+                handleAutoCompleteChange(e, 'area');
+              }}
+            />
+          </Grid>
+        ) : (
+          <>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                select
+                label="Division"
+                name="division"
+                fullWidth
+                value={formInputs.division}
+                onChange={handleChange}
+                required
+              >
+                {districtMapping.map((option) => (
+                  <MenuItem key={option.id} value={option.division}>
+                    {option.division}
                   </MenuItem>
-                ));
-              }
-            })}
-          </TextField>
-        </Grid>
+                ))}
+              </TextField>
+            </Grid>
 
-        <Grid item xs={12} sm={4}>
-          <TextField
-            label="Area"
-            name="area"
-            fullWidth
-            value={formInputs.area}
-            onChange={handleChange}
-            sx={{ width: '100%' }}
-            size="small"
-            required
-          />
-        </Grid>
+            <Grid item xs={12} sm={4}>
+              <TextField
+                select
+                label="District"
+                name="district"
+                fullWidth
+                value={formInputs.district}
+                onChange={handleChange}
+                required
+              >
+                {districtMapping.map((option) => {
+                  if (option.division === formInputs.division) {
+                    return option.district.map((item) => (
+                      <MenuItem key={item} value={item}>
+                        {item}
+                      </MenuItem>
+                    ));
+                  }
+                })}
+              </TextField>
+            </Grid>
+
+            <Grid item xs={12} sm={4}>
+              <TextField
+                label="Area"
+                name="area"
+                fullWidth
+                value={formInputs.area}
+                onChange={handleChange}
+                required
+              />
+            </Grid>
+          </>
+        )}
       </Grid>
 
-      <Typography color="text.secondary" sx={{ mt: 4, mb: 2 }}>
-        Display Picture
-      </Typography>
+      <Grid item xs={12}>
+        <Typography
+          sx={{
+            mt: 5,
+            mb: 2,
+            fontSize: '1.1rem',
+            color: 'primary.main',
+          }}
+        >
+          Display Picture
+        </Typography>
+      </Grid>
       {!(imageUrl || previewUrl) && (
         <Button variant="outlined" component="label" sx={{ my: 2 }}>
           Upload Display Picture

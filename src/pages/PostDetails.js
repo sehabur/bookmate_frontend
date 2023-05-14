@@ -1,4 +1,5 @@
 import {
+  Alert,
   Avatar,
   Box,
   Button,
@@ -8,7 +9,6 @@ import {
   IconButton,
   List,
   ListItem,
-  ListItemIcon,
   ListItemText,
   Paper,
   Stack,
@@ -21,6 +21,8 @@ import { useParams, useNavigate, Link as RouterLink } from 'react-router-dom';
 
 import { Carousel } from 'react-carousel-minimal';
 
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import EmailIcon from '@mui/icons-material/Email';
 import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
 import BookmarkAddedIcon from '@mui/icons-material/BookmarkAdded';
 import SellIcon from '@mui/icons-material/Sell';
@@ -34,8 +36,6 @@ import Spinner from '../components/shared/Spinner';
 import axios from 'axios';
 import ReactTimeAgo from 'react-time-ago';
 import { useSelector } from 'react-redux';
-
-import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 import ToastMessage from '../components/shared/ToastMessage';
 
@@ -160,7 +160,7 @@ const PostDetails = () => {
         setToastOpen(true);
         setToastMessage({
           severity: 'error',
-          message: 'Please login to save a post for later.',
+          message: 'Please sign in to save a post for later.',
         });
       }
     } catch (error) {
@@ -176,7 +176,7 @@ const PostDetails = () => {
         const response = await axios.post(
           `${process.env.REACT_APP_BACKEND_URL}/api/orders/request`,
           {
-            requestedTo: postDetails.user._id,
+            requestedTo: postDetails.user,
             orderItem: postId,
             offerType,
             price: postDetails.price,
@@ -203,7 +203,7 @@ const PostDetails = () => {
         setToastOpen(true);
         setToastMessage({
           severity: 'error',
-          message: 'Please login to send a request.',
+          message: 'Please sign in  to send a request.',
         });
       }
     } catch (error) {
@@ -235,7 +235,7 @@ const PostDetails = () => {
       setToastOpen(true);
       setToastMessage({
         severity: 'error',
-        message: 'Please login to send message.',
+        message: 'Please sign in to send message.',
       });
 
       setIsLoading(false);
@@ -327,7 +327,7 @@ const PostDetails = () => {
                 radius="8px"
                 slideNumber={true}
                 dots={true}
-                slideBackgroundColor="#555555"
+                slideBackgroundColor="#555"
                 slideImageFit="contain"
                 thumbnails={true}
                 thumbnailWidth="100px"
@@ -335,7 +335,6 @@ const PostDetails = () => {
                   textAlign: 'center',
                   margin: '20px auto',
                 }}
-                arrowStyle={{ color: 'red' }}
               />
               <Grid container alignItems="center" sx={{ mb: 2 }}>
                 <Grid item>
@@ -376,8 +375,7 @@ const PostDetails = () => {
               )}
 
               <Typography sx={{ mb: 0.5 }}>
-                Location: {postDetails.area}, {postDetails.district},{' '}
-                {postDetails.division}
+                Location: {postDetails.area}, {postDetails.district}
               </Typography>
               <Typography sx={{ mb: 0.5 }}>
                 Category: {postDetails.category}
@@ -388,6 +386,21 @@ const PostDetails = () => {
 
               {!isPostFromUser ? (
                 <Box sx={{ my: 2, display: 'flex', alignItems: 'center' }}>
+                  {isExchangeReqPlaced ? (
+                    <Stack direction="row" alignItems="center">
+                      <CheckCircleOutlineIcon />
+                      <Typography sx={{ ml: 0.5 }}>
+                        Exchange Request Placed
+                      </Typography>
+                    </Stack>
+                  ) : (
+                    <Button
+                      variant="outlined"
+                      onClick={(e) => handlePlaceOrder(e, 'exchange')}
+                    >
+                      Send Exchange Request
+                    </Button>
+                  )}
                   {isBuyReqPlaced ? (
                     <Stack direction="row" alignItems="center">
                       <CheckCircleOutlineIcon />
@@ -397,26 +410,11 @@ const PostDetails = () => {
                     </Stack>
                   ) : (
                     <Button
-                      variant="outlined"
-                      onClick={(e) => handlePlaceOrder(e, 'buy')}
-                    >
-                      Send Buy request
-                    </Button>
-                  )}
-                  {isExchangeReqPlaced ? (
-                    <Stack direction="row" alignItems="center" sx={{ ml: 2 }}>
-                      <CheckCircleOutlineIcon />
-                      <Typography sx={{ ml: 0.5 }}>
-                        Exchange Request Placed
-                      </Typography>
-                    </Stack>
-                  ) : (
-                    <Button
                       variant="contained"
+                      onClick={(e) => handlePlaceOrder(e, 'buy')}
                       sx={{ ml: { xs: 1, sm: 2 } }}
-                      onClick={(e) => handlePlaceOrder(e, 'exchange')}
                     >
-                      Send Exchange request
+                      Send Buy Request
                     </Button>
                   )}
                 </Box>
@@ -432,6 +430,15 @@ const PostDetails = () => {
                   </Button>
                 </Box>
               )}
+
+              <Alert severity="info">
+                <Typography>
+                  Send buy/exchange request and wait for response from seller
+                </Typography>
+                <Typography>
+                  OR Get in touch directly with seller by email/call/message
+                </Typography>
+              </Alert>
 
               <Divider sx={{ my: 3 }} />
               <Typography
@@ -489,11 +496,7 @@ const PostDetails = () => {
                           mb: 2,
                         }}
                         secondaryAction={
-                          <IconButton
-                            edge="start"
-                            color="primary"
-                            disableRipple
-                          >
+                          <IconButton edge="start" disabled>
                             <CallIcon />
                           </IconButton>
                         }
@@ -504,6 +507,24 @@ const PostDetails = () => {
                         />
                       </ListItem>
                     )}
+
+                    <ListItem
+                      sx={{
+                        border: '1px solid #ccc',
+                        borderRadius: 1.3,
+                        mb: 2,
+                      }}
+                      secondaryAction={
+                        <IconButton edge="start" disabled>
+                          <EmailIcon />
+                        </IconButton>
+                      }
+                    >
+                      <ListItemText
+                        primary="Send e-mail"
+                        secondary={postDetails.user.email}
+                      />
+                    </ListItem>
 
                     <ListItem
                       sx={{
